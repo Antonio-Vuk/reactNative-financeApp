@@ -16,6 +16,7 @@ import {
     AppExpander,
     AppButton,
     GoBackArrow,
+    CustomCategory,
 } from "../components";
 import { icons, STYLES, COLORS, SIZES, FONTS, constants } from "../constants";
 import { AppContext } from "../contexts";
@@ -23,6 +24,8 @@ import { BlurView } from "expo-blur";
 import { FontAwesome } from "@expo/vector-icons";
 import { createCustomFieldController } from "../controllers/customFieldsController";
 import { useNavigation } from "@react-navigation/native";
+import { getCustomFiledType, showError } from "../utils/helpersFunctions";
+import { defaultState } from "../store/state";
 
 const CreateCustomFieldScreen = () => {
     const { state, setState } = useContext(AppContext);
@@ -185,6 +188,9 @@ const CreateCustomFieldScreen = () => {
                             />
                         </>
                     )}
+                    <Text style={{ ...FONTS.h3, marginTop: SIZES.base }}>
+                        Category:
+                    </Text>
                     <CustomCategory
                         state={state}
                         category={category}
@@ -198,167 +204,6 @@ const CreateCustomFieldScreen = () => {
 
                 <View style={{ height: 100 }}></View>
             </ScrollView>
-        </View>
-    );
-};
-
-import {
-    getCustomFiledType,
-    showError,
-    subString,
-} from "../utils/helpersFunctions";
-import { defaultState } from "../store/state";
-import { showMessage } from "react-native-flash-message";
-const CustomCategory = ({ state, category, setCategory }) => {
-    return (
-        <View>
-            <Text style={{ ...FONTS.h3, marginTop: SIZES.base }}>
-                Category:
-            </Text>
-            <FlatList
-                ListHeaderComponent={() => (
-                    <TouchableOpacity
-                        style={{
-                            width: 50,
-                            height: 97,
-                            padding: SIZES.padding / 2,
-                            backgroundColor:
-                                category == 0 ? COLORS.primary : COLORS.white,
-                            borderRadius: SIZES.radius,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            marginRight: SIZES.padding / 2,
-                            ...STYLES.shadow,
-                        }}
-                        onPress={() => {
-                            setCategory(0);
-                        }}
-                    >
-                        <Text
-                            style={{
-                                textAlign: "center",
-                                color:
-                                    category == 0 ? COLORS.white : COLORS.black,
-                                ...FONTS.h4,
-                            }}
-                        >
-                            Al Categories
-                        </Text>
-                    </TouchableOpacity>
-                )}
-                showsHorizontalScrollIndicator={false}
-                horizontal={true}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        onPress={() => {
-                            setCategory(item.id);
-                        }}
-                        style={{
-                            padding: SIZES.padding / 2,
-                            backgroundColor:
-                                category == item.id && category != 0
-                                    ? item.color
-                                    : COLORS.white,
-                            borderRadius: SIZES.radius,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            marginRight: SIZES.padding / 2,
-                            ...STYLES.shadow,
-                            paddingBottom: 0,
-                            paddingHorizontal: 0,
-                        }}
-                    >
-                        <View
-                            style={{
-                                width: 50,
-                                height: 50,
-                                borderRadius: 25,
-                                marginHorizontal: SIZES.base / 2,
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor:
-                                    category == item.id && category != 0
-                                        ? COLORS.white
-                                        : COLORS.lightgray,
-                            }}
-                        >
-                            <Image
-                                source={item.icon}
-                                resizeMode="contain"
-                                style={{
-                                    width: 30,
-                                    height: 30,
-                                }}
-                            />
-                        </View>
-
-                        <Text
-                            style={{
-                                marginTop: SIZES.padding,
-                                color: COLORS.black,
-                                ...FONTS.h4,
-                            }}
-                        >
-                            {subString(item.name)}
-                        </Text>
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                height: 10,
-                                width: "100%",
-                            }}
-                        >
-                            {item.type == constants.income && (
-                                <View
-                                    style={{
-                                        flex: 1,
-                                        backgroundColor: COLORS.green,
-                                        borderBottomLeftRadius:
-                                            SIZES.radius * 2,
-                                        borderBottomRightRadius:
-                                            SIZES.radius * 2,
-                                    }}
-                                ></View>
-                            )}
-                            {item.type == constants.expense && (
-                                <View
-                                    style={{
-                                        flex: 1,
-                                        backgroundColor: COLORS.red,
-                                        borderBottomLeftRadius:
-                                            SIZES.radius * 2,
-                                        borderBottomRightRadius:
-                                            SIZES.radius * 2,
-                                    }}
-                                ></View>
-                            )}
-                            {item.type == constants.both && (
-                                <>
-                                    <View
-                                        style={{
-                                            flex: 1,
-                                            backgroundColor: COLORS.green,
-                                            borderBottomLeftRadius:
-                                                SIZES.radius * 2,
-                                        }}
-                                    />
-                                    <View
-                                        style={{
-                                            flex: 1,
-                                            backgroundColor: COLORS.red,
-                                            borderBottomRightRadius:
-                                                SIZES.radius * 2,
-                                        }}
-                                    />
-                                </>
-                            )}
-                        </View>
-                    </TouchableOpacity>
-                )}
-                data={state.categories}
-                contentContainerStyle={{ margin: 10 }}
-            />
         </View>
     );
 };

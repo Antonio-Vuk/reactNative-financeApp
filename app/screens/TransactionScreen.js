@@ -50,7 +50,6 @@ import routes from "../navigation/routes";
 import CustomFields from "../components/CustomFields";
 import { defaultState } from "../store/state";
 import { getCategoryHF } from "../utils/helpersFunctions";
-import { uploadImagesToFirebase } from "../firebase";
 import useLocation from "../hooks/useLocation";
 
 const TransactionScreen = ({ route, navigation }) => {

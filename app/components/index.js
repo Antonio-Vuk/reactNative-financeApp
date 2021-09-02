@@ -19,6 +19,7 @@ import ImageInput from "./ImageInput";
 import ImageInputList from "./ImageInputList";
 import ImagaViever from "./ImagaViever";
 import LocationViewer from "./LocationViewer";
+import CustomCategory from "./CustomCategory";
 
 export {
     AppButton,
@@ -42,4 +43,5 @@ export {
     ImageInputList,
     ImagaViever,
     LocationViewer,
+    CustomCategory,
 };

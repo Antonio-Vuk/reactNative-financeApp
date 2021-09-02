@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 import {
@@ -11,7 +11,13 @@ import {
 } from "react-native";
 import { format } from "date-fns";
 
-import { AppDivider, DeleteActionsSwipeable } from "../components";
+import {
+    AppDivider,
+    CustomCategory,
+    DeleteActionsSwipeable,
+    AppExpander,
+    AppDatePickerModal,
+} from "../components";
 import { AppContext } from "../contexts";
 import { COLORS, constants, FONTS, icons, SIZES, STYLES } from "../constants";
 import { getCategory, showError, subString } from "../utils/helpersFunctions";
@@ -27,25 +33,193 @@ import {
 import { deleteTransactionController } from "../controllers/transactionController";
 
 const TransactionsScreen = () => {
+    const { state, setState } = useContext(AppContext);
+    const [category, setCategory] = useState(0);
+    const [fromDate, setFromDate] = useState();
+    const [toDate, setToDate] = useState(new Date());
+
     return (
-        <View
+        <ScrollView
             style={{
                 flex: 1,
                 paddingTop: SIZES.statusBarHeight,
             }}
         >
-            <TransactionList />
-        </View>
+            {state.transactions.length > 0 && (
+                <View
+                    style={{
+                        margin: SIZES.padding,
+                        ...STYLES.container,
+                        ...STYLES.shadow,
+                    }}
+                >
+                    <DateFilters
+                        fromDate={fromDate}
+                        setFromDate={setFromDate}
+                        toDate={toDate}
+                        setToDate={setToDate}
+                    />
+                    <CustomCategory
+                        state={state}
+                        category={category}
+                        setCategory={setCategory}
+                    />
+                </View>
+            )}
+            <TransactionList
+                toDate={toDate}
+                fromDate={fromDate}
+                category={category}
+            />
+        </ScrollView>
     );
 };
 export default TransactionsScreen;
 
-const TransactionList = () => {
+const DateFilters = ({ fromDate, setFromDate, toDate, setToDate }) => {
+    return (
+        <>
+            <View
+                style={{
+                    height: SIZES.lineHeight,
+                    alignItems: "center",
+                }}
+            >
+                <Text
+                    style={{
+                        ...FONTS.h2,
+                    }}
+                >
+                    FILTER
+                </Text>
+            </View>
+            <AppDivider />
+            <View
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    height: SIZES.lineHeight,
+                }}
+            >
+                <Text style={{ ...FONTS.h3 }}>From date:</Text>
+                <AppExpander />
+                {fromDate != undefined && (
+                    <>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setFromDate(undefined);
+                            }}
+                        >
+                            <View
+                                style={{
+                                    height: "100%",
+                                    width: 50,
+                                    justifyContent: "center",
+                                    alignItems: "flex-end",
+                                    paddingRight: 10,
+                                }}
+                            >
+                                <FontAwesome name={icons.remove} size={20} />
+                            </View>
+                        </TouchableOpacity>
+
+                        <AppDatePickerModal
+                            date={fromDate}
+                            setDate={setFromDate}
+                            custom={true}
+                            visible={false}
+                            onPress={(date) => {
+                                setFromDate(date);
+                            }}
+                        />
+                    </>
+                )}
+                {fromDate == undefined && (
+                    <TouchableOpacity
+                        style={{
+                            flex: 1,
+                            height: "100%",
+                            justifyContent: "center",
+                            alignItems: "flex-end",
+                        }}
+                        onPress={() => {
+                            setFromDate(new Date());
+                        }}
+                    >
+                        <Text
+                            style={{
+                                ...FONTS.body3,
+                                color: COLORS.lightgray,
+                            }}
+                        >
+                            none
+                        </Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+            <AppDivider />
+            <View
+                style={{
+                    flexDirection: "row",
+                    height: SIZES.lineHeight,
+                    alignItems: "center",
+                }}
+            >
+                <Text style={{ ...FONTS.h3 }}>To date:</Text>
+                <AppExpander />
+                <AppDatePickerModal
+                    date={toDate}
+                    setDate={setToDate}
+                    custom={true}
+                    visible={false}
+                    onPress={(date) => {
+                        setToDate(date);
+                    }}
+                />
+            </View>
+        </>
+    );
+};
+
+const TransactionList = ({ toDate, fromDate, category }) => {
     const { state, setState } = useContext(AppContext);
+    const [transactions, setTransactions] = useState(state.transactions);
     const navigation = useNavigation();
 
+    const displayMessage = () => {
+        return state.transactions.length > 0
+            ? "Transactions"
+            : "No Transactions";
+    };
+
+    useEffect(() => {
+        filteredData(state);
+    }, [toDate, fromDate, category]);
+
+    const filteredData = (state) => {
+        let transactions = state.transactions;
+
+        if (fromDate) {
+            transactions = transactions.filter(
+                (t) => new Date(t.date) >= fromDate
+            );
+        }
+
+        transactions = transactions.filter((t) => toDate >= new Date(t.date));
+
+        transactions = transactions.filter(
+            (t) => t.categoryId == category || category == "0"
+        );
+
+        transactions.sort((a, b) => {
+            return new Date(a.date) < new Date(b.date);
+        });
+
+        setTransactions(transactions);
+    };
+
     return (
-        <ScrollView>
+        <>
             <FlatList
                 showsVerticalScrollIndicator={false}
                 ListHeaderComponent={() => (
@@ -56,9 +230,7 @@ const TransactionList = () => {
                             }}
                         >
                             <Text style={{ flex: 1, ...FONTS.h2 }}>
-                                {state.transactions.length > 0
-                                    ? "All transactions"
-                                    : "No Transactions"}
+                                {displayMessage()}
                             </Text>
 
                             <TouchableOpacity
@@ -89,9 +261,7 @@ const TransactionList = () => {
                         <View />
                     </>
                 )}
-                data={state.transactions.sort((a, b) => {
-                    return new Date(a.date) < new Date(b.date);
-                })}
+                data={transactions}
                 renderItem={(item) =>
                     RenderListItem(item, state, setState, navigation)
                 }
@@ -104,7 +274,7 @@ const TransactionList = () => {
                 }}
             />
             <View style={{ height: 100 }}></View>
-        </ScrollView>
+        </>
     );
 };
 
