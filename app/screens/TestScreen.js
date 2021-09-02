@@ -17,7 +17,7 @@ const TestScreen = () => {
 
     useEffect(() => {
         getChartData(state, setData, wallet, time);
-    }, [wallet, state.transactions, time]);
+    }, [wallet, state, time]);
 
     return (
         <Screen>

@@ -65,7 +65,9 @@ const AppNavigator = () => {
                     tabBarButton: (props) => (
                         <TabBarCustomButton
                             {...props}
-                            onCustomPress={() => {}}
+                            onCustomPress={() => {
+                                console.log("Pressed");
+                            }}
                         />
                     ),
                 }}

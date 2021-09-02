@@ -194,7 +194,7 @@ const TransactionList = ({ toDate, fromDate, category }) => {
 
     useEffect(() => {
         filteredData(state);
-    }, [toDate, fromDate, category]);
+    }, [state, toDate, fromDate, category]);
 
     const filteredData = (state) => {
         let transactions = state.transactions;
@@ -211,7 +211,7 @@ const TransactionList = ({ toDate, fromDate, category }) => {
             (t) => t.categoryId == category || category == "0"
         );
 
-        transactions.sort((a, b) => {
+        transactions = transactions.sort((a, b) => {
             return new Date(a.date) < new Date(b.date);
         });
 
