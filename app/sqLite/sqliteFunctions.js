@@ -92,6 +92,7 @@ const createTransactionSQLite = ({
     toAccountId,
     fromAccountId,
     type,
+    status,
 }) => {
     return new Promise((resolve, reject) => {
         const newId = generateId();
@@ -107,6 +108,7 @@ const createTransactionSQLite = ({
                         toAccountId,
                         fromAccountId,
                         type,
+                        status,
                     };
 
                     resolve(transaction);
@@ -123,6 +125,7 @@ const createTransactionSQLite = ({
                 toAccountId,
                 fromAccountId,
                 type,
+                status,
             ]
         );
     });

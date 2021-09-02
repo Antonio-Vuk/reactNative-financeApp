@@ -6,7 +6,7 @@ import {
 } from "@react-navigation/bottom-tabs";
 import Svg, { Path } from "react-native-svg";
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
-import { COLORS, icons, STYLES } from "../constants";
+import { COLORS, constants, icons, STYLES } from "../constants";
 
 import HomeScreenNavigator from "./HomeScreenNavigator";
 import TransactionNavigator from "./TransactionNavigator";
@@ -15,6 +15,7 @@ import TestingNavigator from "./TestingNavigator";
 import routes from "./routes";
 import { useContext } from "react/cjs/react.development";
 import { AppContext } from "../contexts";
+import { EventEmitter } from "../myEvents";
 
 const Tab = createBottomTabNavigator();
 
@@ -66,7 +67,7 @@ const AppNavigator = () => {
                         <TabBarCustomButton
                             {...props}
                             onCustomPress={() => {
-                                console.log("Pressed");
+                                EventEmitter.emit(constants.myEvent);
                             }}
                         />
                     ),

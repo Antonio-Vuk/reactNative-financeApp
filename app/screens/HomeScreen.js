@@ -40,8 +40,43 @@ const HomeScreen = () => {
             <ScrollView style={{ flex: 1 }}>
                 <RenderHeader setState={setState} />
                 {state.transactions.length > 0 && <PieChartCategoryes />}
+                <RenderIncomingTransactions setState={setState} />
                 <View style={{ height: 100 }}></View>
             </ScrollView>
+        </View>
+    );
+};
+
+const RenderIncomingTransactions = ({ setState }) => {
+    const navigation = useNavigation();
+    return (
+        <View
+            style={{
+                ...STYLES.container,
+                ...STYLES.shadow,
+                margin: SIZES.padding,
+            }}
+        >
+            <View
+                style={{
+                    flexDirection: "row",
+                }}
+            >
+                <Text style={{ flex: 1, ...FONTS.h2 }}>Incoming expenses</Text>
+
+                <TouchableOpacity
+                    onPress={() => {
+                        unSetFieldsValuesLocalState();
+                        setState({ ...defaultState });
+                        navigation.navigate(routes.editTransaction, {
+                            editMode: false,
+                            template: true,
+                        });
+                    }}
+                >
+                    <FontAwesome name="plus" size={30} color={COLORS.black} />
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };

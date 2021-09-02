@@ -31,12 +31,13 @@ import {
     unSetFieldsValuesLocalState,
 } from "../store/customFieldsState";
 import { deleteTransactionController } from "../controllers/transactionController";
+import { EventEmitter } from "../myEvents";
 
 const TransactionsScreen = () => {
     const { state, setState } = useContext(AppContext);
     const [category, setCategory] = useState(0);
     const [fromDate, setFromDate] = useState();
-    const [toDate, setToDate] = useState(new Date());
+    const [toDate, setToDate] = useState();
 
     return (
         <ScrollView
@@ -75,6 +76,212 @@ const TransactionsScreen = () => {
     );
 };
 export default TransactionsScreen;
+
+const TransactionList = ({ toDate, fromDate, category }) => {
+    const { state, setState } = useContext(AppContext);
+    const [transactions, setTransactions] = useState(state.transactions);
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        EventEmitter.on(constants.myEvent, filteredData);
+        return () => {
+            EventEmitter.removeListener(constants.myEvent, filteredData);
+        };
+    }, []);
+
+    const displayMessage = () => {
+        return state.transactions.length > 0
+            ? "Transactions"
+            : "No Transactions";
+    };
+
+    useEffect(() => {
+        filteredData();
+    }, [toDate, fromDate, category]);
+
+    const filteredData = () => {
+        let transactions = defaultState.transactions;
+
+        if (fromDate) {
+            transactions = transactions.filter(
+                (t) => new Date(t.date) >= fromDate
+            );
+        }
+
+        if (toDate) {
+            transactions = transactions.filter(
+                (t) => new Date(toDate) >= new Date(t.date)
+            );
+        }
+
+        transactions = transactions.filter(
+            (t) => t.categoryId == category || category == "0"
+        );
+
+        transactions = transactions.filter(
+            (t) => t.status == constants.processed
+        );
+
+        transactions = transactions.sort((a, b) => {
+            return new Date(a.date) < new Date(b.date);
+        });
+        setTransactions(transactions);
+    };
+
+    return (
+        <>
+            <FlatList
+                showsVerticalScrollIndicator={false}
+                ListHeaderComponent={() => (
+                    <>
+                        <View
+                            style={{
+                                flexDirection: "row",
+                            }}
+                        >
+                            <Text style={{ flex: 1, ...FONTS.h2 }}>
+                                {displayMessage()}
+                            </Text>
+
+                            <TouchableOpacity
+                                onPress={() => {
+                                    unSetFieldsValuesLocalState();
+                                    setState({ ...defaultState });
+                                    navigation.navigate(
+                                        routes.editTransaction,
+                                        { editMode: false }
+                                    );
+                                }}
+                            >
+                                <FontAwesome
+                                    name="plus"
+                                    size={30}
+                                    color={COLORS.black}
+                                />
+                            </TouchableOpacity>
+                        </View>
+
+                        {state.transactions.length > 0 && (
+                            <Text
+                                style={{ ...FONTS.body3, color: COLORS.gray }}
+                            >
+                                Total: {state.transactions.length}
+                            </Text>
+                        )}
+                        <View />
+                    </>
+                )}
+                data={transactions}
+                renderItem={(item) =>
+                    RenderListItem(
+                        item,
+                        state,
+                        setState,
+                        navigation,
+                        filteredData
+                    )
+                }
+                keyExtractor={(item) => item.id.toString()}
+                ItemSeparatorComponent={() => <AppDivider />}
+                contentContainerStyle={{
+                    margin: SIZES.padding,
+                    ...STYLES.container,
+                    ...STYLES.shadow,
+                }}
+            />
+            <View style={{ height: 100 }}></View>
+        </>
+    );
+};
+
+const RenderListItem = (
+    { item },
+    state,
+    setState,
+    navigation,
+    filteredData
+) => {
+    var category = getCategory(item.categoryId);
+
+    return (
+        <View>
+            <DeleteActionsSwipeable
+                onPress={async () => {
+                    if (defaultState.user != constants.offline) {
+                        defaultState.loading = true;
+                        setState({ ...defaultState });
+                    }
+                    try {
+                        deleteTransactionController(item, () => {
+                            filteredData();
+                            setState({ ...defaultState });
+                        });
+                    } catch (error) {
+                        showError(error);
+                    } finally {
+                        defaultState.loading = false;
+                        setState({ ...defaultState });
+                    }
+                }}
+            >
+                <TouchableOpacity
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingVertical: SIZES.base,
+                    }}
+                    onPress={() => {
+                        setFieldsValuesLocalState(item.id);
+                        setState({ ...defaultState });
+                        navigation.navigate(routes.transaction, {
+                            transaction: item,
+                        });
+                    }}
+                >
+                    <Image
+                        source={category.icon}
+                        style={{
+                            width: 35,
+                            height: 35,
+                            tintColor: category.color,
+                        }}
+                    />
+                    <View style={{ flex: 1, marginLeft: SIZES.radius }}>
+                        <Text style={{ ...FONTS.h3 }}>{category.name}</Text>
+                        {item.note != "" && (
+                            <Text>{subString(item.note, 20)}</Text>
+                        )}
+                        <Text style={{ color: COLORS.gray, ...FONTS.body4 }}>
+                            {format(new Date(item?.date), "yyyy MMM dd - H:MM")}
+                        </Text>
+                    </View>
+
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            height: "100%",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Text
+                            style={{
+                                color: getColorByType(item.type),
+                                ...FONTS.h3,
+                            }}
+                        >
+                            {item.amount} {state.currency.currenciesCode}
+                        </Text>
+                        <AntDesign
+                            name={icons.foward}
+                            size={30}
+                            color={COLORS.primary}
+                        />
+                    </View>
+                </TouchableOpacity>
+            </DeleteActionsSwipeable>
+        </View>
+    );
+};
 
 const DateFilters = ({ fromDate, setFromDate, toDate, setToDate }) => {
     return (
@@ -161,201 +368,67 @@ const DateFilters = ({ fromDate, setFromDate, toDate, setToDate }) => {
             <View
                 style={{
                     flexDirection: "row",
-                    height: SIZES.lineHeight,
                     alignItems: "center",
+                    height: SIZES.lineHeight,
                 }}
             >
-                <Text style={{ ...FONTS.h3 }}>To date:</Text>
+                <Text style={{ ...FONTS.h3 }}>From date:</Text>
                 <AppExpander />
-                <AppDatePickerModal
-                    date={toDate}
-                    setDate={setToDate}
-                    custom={true}
-                    visible={false}
-                    onPress={(date) => {
-                        setToDate(date);
-                    }}
-                />
-            </View>
-        </>
-    );
-};
-
-const TransactionList = ({ toDate, fromDate, category }) => {
-    const { state, setState } = useContext(AppContext);
-    const [transactions, setTransactions] = useState(state.transactions);
-    const navigation = useNavigation();
-
-    const displayMessage = () => {
-        return state.transactions.length > 0
-            ? "Transactions"
-            : "No Transactions";
-    };
-
-    useEffect(() => {
-        filteredData(state);
-    }, [state, toDate, fromDate, category]);
-
-    const filteredData = (state) => {
-        let transactions = state.transactions;
-
-        if (fromDate) {
-            transactions = transactions.filter(
-                (t) => new Date(t.date) >= fromDate
-            );
-        }
-
-        transactions = transactions.filter((t) => toDate >= new Date(t.date));
-
-        transactions = transactions.filter(
-            (t) => t.categoryId == category || category == "0"
-        );
-
-        transactions = transactions.sort((a, b) => {
-            return new Date(a.date) < new Date(b.date);
-        });
-
-        setTransactions(transactions);
-    };
-
-    return (
-        <>
-            <FlatList
-                showsVerticalScrollIndicator={false}
-                ListHeaderComponent={() => (
+                {toDate != undefined && (
                     <>
-                        <View
-                            style={{
-                                flexDirection: "row",
+                        <TouchableOpacity
+                            onPress={() => {
+                                setToDate(undefined);
                             }}
                         >
-                            <Text style={{ flex: 1, ...FONTS.h2 }}>
-                                {displayMessage()}
-                            </Text>
-
-                            <TouchableOpacity
-                                onPress={() => {
-                                    unSetFieldsValuesLocalState();
-                                    setState({ ...defaultState });
-                                    navigation.navigate(
-                                        routes.editTransaction,
-                                        { editMode: false }
-                                    );
+                            <View
+                                style={{
+                                    height: "100%",
+                                    width: 50,
+                                    justifyContent: "center",
+                                    alignItems: "flex-end",
+                                    paddingRight: 10,
                                 }}
                             >
-                                <FontAwesome
-                                    name="plus"
-                                    size={30}
-                                    color={COLORS.black}
-                                />
-                            </TouchableOpacity>
-                        </View>
+                                <FontAwesome name={icons.remove} size={20} />
+                            </View>
+                        </TouchableOpacity>
 
-                        {state.transactions.length > 0 && (
-                            <Text
-                                style={{ ...FONTS.body3, color: COLORS.gray }}
-                            >
-                                Total: {state.transactions.length}
-                            </Text>
-                        )}
-                        <View />
+                        <AppDatePickerModal
+                            date={toDate}
+                            setDate={setToDate}
+                            custom={true}
+                            visible={false}
+                            onPress={(date) => {
+                                setToDate(date);
+                            }}
+                        />
                     </>
                 )}
-                data={transactions}
-                renderItem={(item) =>
-                    RenderListItem(item, state, setState, navigation)
-                }
-                keyExtractor={(item) => item.id.toString()}
-                ItemSeparatorComponent={() => <AppDivider />}
-                contentContainerStyle={{
-                    margin: SIZES.padding,
-                    ...STYLES.container,
-                    ...STYLES.shadow,
-                }}
-            />
-            <View style={{ height: 100 }}></View>
-        </>
-    );
-};
-
-const RenderListItem = ({ item }, state, setState, navigation) => {
-    var category = getCategory(item.categoryId);
-
-    return (
-        <View>
-            <DeleteActionsSwipeable
-                onPress={async () => {
-                    if (defaultState.user != constants.offline) {
-                        defaultState.loading = true;
-                        setState({ ...defaultState });
-                    }
-                    try {
-                        deleteTransactionController(item, () => {
-                            setState({ ...defaultState });
-                        });
-                    } catch (error) {
-                        showError(error);
-                    } finally {
-                        defaultState.loading = false;
-                        setState({ ...defaultState });
-                    }
-                }}
-            >
-                <TouchableOpacity
-                    style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        paddingVertical: SIZES.base,
-                    }}
-                    onPress={() => {
-                        setFieldsValuesLocalState(item.id);
-                        setState({ ...defaultState });
-                        navigation.navigate(routes.transaction, {
-                            transaction: item,
-                        });
-                    }}
-                >
-                    <Image
-                        source={category.icon}
+                {toDate == undefined && (
+                    <TouchableOpacity
                         style={{
-                            width: 35,
-                            height: 35,
-                            tintColor: category.color,
-                        }}
-                    />
-                    <View style={{ flex: 1, marginLeft: SIZES.radius }}>
-                        <Text style={{ ...FONTS.h3 }}>{category.name}</Text>
-                        {item.note != "" && (
-                            <Text>{subString(item.note, 20)}</Text>
-                        )}
-                        <Text style={{ color: COLORS.gray, ...FONTS.body4 }}>
-                            {format(new Date(item?.date), "yyyy MMM dd - H:MM")}
-                        </Text>
-                    </View>
-
-                    <View
-                        style={{
-                            flexDirection: "row",
+                            flex: 1,
                             height: "100%",
-                            alignItems: "center",
+                            justifyContent: "center",
+                            alignItems: "flex-end",
+                        }}
+                        onPress={() => {
+                            setToDate(new Date());
                         }}
                     >
                         <Text
                             style={{
-                                color: getColorByType(item.type),
-                                ...FONTS.h3,
+                                ...FONTS.body3,
+                                color: COLORS.lightgray,
                             }}
                         >
-                            {item.amount} {state.currency.currenciesCode}
+                            none
                         </Text>
-                        <AntDesign
-                            name={icons.foward}
-                            size={30}
-                            color={COLORS.primary}
-                        />
-                    </View>
-                </TouchableOpacity>
-            </DeleteActionsSwipeable>
-        </View>
+                    </TouchableOpacity>
+                )}
+            </View>
+            <AppDivider />
+        </>
     );
 };

@@ -11,6 +11,9 @@ const wallet = "wallet";
 const category = "category";
 const offline = "offline";
 const all = "All";
+const pending = "Pending";
+const processed = "Processed";
+const myEvent = "reRenderList";
 
 export default {
     zero,
@@ -26,4 +29,7 @@ export default {
     category,
     offline,
     all,
+    pending,
+    processed,
+    myEvent,
 };

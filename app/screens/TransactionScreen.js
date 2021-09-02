@@ -51,6 +51,7 @@ import CustomFields from "../components/CustomFields";
 import { defaultState } from "../store/state";
 import { getCategoryHF } from "../utils/helpersFunctions";
 import useLocation from "../hooks/useLocation";
+import { EventEmitter } from "../myEvents";
 
 const TransactionScreen = ({ route, navigation }) => {
     const { state, setState } = useContext(AppContext);
@@ -64,6 +65,7 @@ const TransactionScreen = ({ route, navigation }) => {
     const [fromAccountId, setFromAccountId] = useState();
     const [categoryId, setCategoryId] = useState();
     const [imageUris, setImageUris] = useState([]);
+    const [template, setTemplate] = useState(route.params.template);
     const location = useLocation();
 
     useEffect(() => {
@@ -184,35 +186,32 @@ const TransactionScreen = ({ route, navigation }) => {
                 }
             }
 
+            let transaction = {
+                type,
+                amount,
+                date,
+                note,
+                toAccountId,
+                fromAccountId,
+                categoryId,
+                status:
+                    template == true ? constants.pending : constants.processed,
+            };
+
             if (editMode == true) {
-                const transaction = route.params.transaction;
-                await updateTransactionController({
-                    type,
-                    amount,
-                    date,
-                    note,
-                    toAccountId,
-                    fromAccountId,
-                    categoryId,
-                    id: transaction.id,
-                    imageUris,
-                });
+                transaction.id = route.params.transaction.id;
+                await updateTransactionController(transaction);
                 successMessage("Transaction edited!");
                 route.params.callBack();
+                s;
             } else {
-                await createTransactionController({
-                    amount,
-                    categoryId,
-                    date,
-                    note,
-                    toAccountId,
-                    fromAccountId,
-                    type,
-                    imageUris,
-                    location,
-                });
+                transaction.location = location;
+                await createTransactionController(transaction);
                 successMessage("Transaction created!");
             }
+
+            EventEmitter.emit(constants.myEvent);
+
             setState({ ...defaultState });
             navigation.goBack();
         } catch (error) {

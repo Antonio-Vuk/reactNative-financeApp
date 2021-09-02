@@ -35,14 +35,15 @@ const createTransactionTableSql =
     "toAccountId TEXT, " +
     "fromAccountId TEXT, " +
     "type INTEGER NOT NULL, " +
+    "status TEXT NOT NULL, " +
     "FOREIGN KEY(toAccountId) REFERENCES wallet(id), " +
     "FOREIGN KEY(fromAccountId) REFERENCES wallet(id), " +
     "FOREIGN KEY(categoryId) REFERENCES category(id))";
 
 const insertTransactionSql =
     "INSERT INTO 'transaction' " +
-    " (id, amount, categoryId, date, note, toAccountId, fromAccountId, type) " +
-    "VALUES( ?, ?, ?, ?, ?, ?, ?, ?)";
+    " (id, amount, categoryId, date, note, toAccountId, fromAccountId, type, status) " +
+    "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 const selectAllTransactionSql = "SELECT * from 'transaction' ORDER BY id DESC";
 const updateTransactionSql =

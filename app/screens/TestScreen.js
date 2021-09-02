@@ -21,37 +21,64 @@ const TestScreen = () => {
 
     return (
         <Screen>
-            <View
-                style={{
-                    backgroundColor: "white",
-                    marginHorizontal: SIZES.padding,
-                    borderRadius: 30,
-                }}
-            >
-                <WalletSelector
-                    wallet={wallet}
-                    setWallet={setWallet}
-                    state={state}
-                ></WalletSelector>
-                <Chart data={data}></Chart>
-                <TimeSelector
-                    timeArray={timeArray}
-                    setTime={setTime}
-                    time={time}
-                ></TimeSelector>
-            </View>
+            {state.transactions.length > 1 && (
+                <>
+                    <View
+                        style={{
+                            backgroundColor: "white",
+                            marginHorizontal: SIZES.padding,
+                            borderRadius: 30,
+                        }}
+                    >
+                        <WalletSelector
+                            wallet={wallet}
+                            setWallet={setWallet}
+                            state={state}
+                        ></WalletSelector>
+                        <Chart data={data}></Chart>
+                        <TimeSelector
+                            timeArray={timeArray}
+                            setTime={setTime}
+                            time={time}
+                        ></TimeSelector>
+                    </View>
 
-            <View
-                style={{
-                    marginVertical: SIZES.padding,
-                    paddingVertical: SIZES.padding,
-                    backgroundColor: "white",
-                    marginHorizontal: SIZES.padding,
-                    borderRadius: 30,
-                }}
-            >
-                <StatisticDetails state={state} wallet={wallet} time={time} />
-            </View>
+                    <View
+                        style={{
+                            marginVertical: SIZES.padding,
+                            paddingVertical: SIZES.padding,
+                            backgroundColor: "white",
+                            marginHorizontal: SIZES.padding,
+                            borderRadius: 30,
+                        }}
+                    >
+                        <StatisticDetails
+                            state={state}
+                            wallet={wallet}
+                            time={time}
+                        />
+                    </View>
+                </>
+            )}
+            {state.transactions.length < 2 && (
+                <>
+                    <View
+                        style={{
+                            backgroundColor: "white",
+                            marginHorizontal: SIZES.padding,
+                            borderRadius: 30,
+                            height: SIZES.lineHeight,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            paddingLeft: SIZES.padding,
+                        }}
+                    >
+                        <Text style={{ ...FONTS.h2 }}>
+                            At least two records required
+                        </Text>
+                    </View>
+                </>
+            )}
         </Screen>
     );
 };
