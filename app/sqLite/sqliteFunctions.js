@@ -24,9 +24,6 @@ const getDataSQLite = () => {
         defaultState.customFields = customFields;
         defaultState.customFieldsListValues = customFieldsListValues;
         defaultState.customFieldsValues = customFieldsValues;
-
-        console.log(defaultState.categories);
-
         resolve(true);
     });
 };

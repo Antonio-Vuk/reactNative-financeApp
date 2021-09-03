@@ -199,6 +199,7 @@ const TransactionScreen = ({ route, navigation }) => {
                 toAccountId,
                 fromAccountId,
                 categoryId,
+                imageUris,
                 status:
                     template == true ? constants.pending : constants.processed,
             };
@@ -209,7 +210,7 @@ const TransactionScreen = ({ route, navigation }) => {
                 successMessage("Transaction edited!");
                 route.params.callBack();
             } else {
-                transaction.location = location;
+                transaction.location = JSON.stringify(location);
                 await createTransactionController(transaction);
                 successMessage("Transaction created!");
             }

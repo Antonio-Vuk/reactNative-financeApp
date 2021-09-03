@@ -40,6 +40,7 @@ import {
     createFuturedTransactionController,
     deleteTransactionController,
 } from "../controllers/transactionController";
+import useLocation from "../hooks/useLocation";
 
 const HomeScreen = () => {
     const { state, setState } = useContext(AppContext);
@@ -69,6 +70,7 @@ const HomeScreen = () => {
 
 const RenderIncomingTransactions = ({ state, setState }) => {
     const navigation = useNavigation();
+    const location = useLocation();
 
     const renderItem = ({ item, index }) => {
         const category = getCategory(item.categoryId);
@@ -177,7 +179,7 @@ const RenderIncomingTransactions = ({ state, setState }) => {
                             color: COLORS.darkgray,
                         }}
                     >
-                        {item.note}
+                        {item.note ? item.note : " "}
                     </Text>
                 </View>
 
@@ -200,6 +202,7 @@ const RenderIncomingTransactions = ({ state, setState }) => {
                         }
                         try {
                             const {
+                                id,
                                 type,
                                 amount,
                                 note,
@@ -209,6 +212,7 @@ const RenderIncomingTransactions = ({ state, setState }) => {
                             } = item;
 
                             let transaction = {
+                                id,
                                 type,
                                 amount,
                                 note,
@@ -218,6 +222,10 @@ const RenderIncomingTransactions = ({ state, setState }) => {
                                 date: new Date(),
                                 status: constants.processed,
                             };
+                            if (defaultState.user != constants.offline) {
+                                transaction.location = JSON.stringify(location);
+                                transaction.imageUris = item.imageUris;
+                            }
                             await createFuturedTransactionController(
                                 transaction
                             );

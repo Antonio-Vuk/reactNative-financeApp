@@ -27,6 +27,7 @@ import { successMessage } from "../utils/helpersFunctions";
 import { Alert } from "react-native";
 import {
     deleteTransactionRest,
+    insertIncomingTransactionRest,
     insertTransactionRest,
     updateTransactionRest,
 } from "../rest/transaction";
@@ -39,7 +40,9 @@ const createFuturedTransactionController = async (_transaction) => {
         let newTransaction = await createTransactionSQLite(transaction);
         insertTransactionState(newTransaction);
 
-        let customs = defaultState.customFieldsValues;
+        let customs = defaultState.customFieldsValues.filter(
+            (custom) => custom.transactionId == _transaction.id
+        );
         customs.forEach((custom) => {
             custom.transactionId = newTransaction.id;
         });
@@ -49,6 +52,21 @@ const createFuturedTransactionController = async (_transaction) => {
 
         saveTransactionCustomFieldsLocalState(newCustomFieldsValues);
     } else {
+        let customs = defaultState.customFieldsValues.filter(
+            (custom) => custom.transactionId == _transaction.id
+        );
+        const result = await insertIncomingTransactionRest(
+            transaction,
+            customs
+        );
+
+        if (result.data) {
+            defaultState.transactions.push(result.data.transaction);
+            defaultState.customFieldsValues =
+                defaultState.customFieldsValues.concat(
+                    result.data.customFieldValues
+                );
+        }
     }
 };
 
@@ -70,7 +88,7 @@ const createTransactionController = async (_transaction) => {
         const imageUrisArray = await uploadImagesToFirebase(
             transaction.imageUris
         );
-        transaction.imageUris = imageUrisArray;
+        transaction.imageUris = JSON.stringify(imageUrisArray);
         const result = await insertTransactionRest(transaction, customs);
         if (result.data) {
             defaultState.transactions.push(result.data.transaction);
@@ -118,7 +136,7 @@ const updateTransactionController = async (_transaction) => {
         const customs = defaultState.customFields.filter(
             (custom) => custom.value != undefined && custom.value != ""
         );
-        transaction.imageUris = oldImages;
+        transaction.imageUris = JSON.stringify(oldImages);
         const result = await updateTransactionRest(transaction, customs);
         if (result.data.transaction.id != undefined) {
             updateTransactionState(result.data.transaction);

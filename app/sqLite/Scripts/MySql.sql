@@ -51,9 +51,9 @@ CREATE TABLE IF NOT EXISTS category (
     type INTEGER NOT NULL, 
     color varchar(50) NOT NULL, 
     icon INTEGER NOT NULL,
-    user INT(50) NOT NULL,
+    userId INT(50) NOT NULL,
     FOREIGN KEY (type) REFERENCES category_type (id),
-    FOREIGN KEY (user) REFERENCES users (id)
+    FOREIGN KEY (userId) REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS wallet (
@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS wallet (
     name varchar(50) NOT NULL UNIQUE,
     ballance NUMERIC NOT NULL,
     color	varchar(50) NOT NULL,
-    user INT(50) NOT NULL,
-    FOREIGN KEY (user) REFERENCES users (id)
+    userId INT(50) NOT NULL,
+    FOREIGN KEY (userId) REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS custom_field(
@@ -70,10 +70,10 @@ CREATE TABLE IF NOT EXISTS custom_field(
     name varchar(50) NOT NULL,
     category INTEGER NOT NULL,
     type INTEGER NOT NULL,
-    user INT(50) NOT NULL,
+    userId INT(50) NOT NULL,
     UNIQUE(name, category),
     FOREIGN KEY (type) REFERENCES custom_field_type (id),
-    FOREIGN KEY (user) REFERENCES users (id)
+    FOREIGN KEY (userId) REFERENCES users (id)
     
 );
 
@@ -93,13 +93,16 @@ CREATE TABLE IF NOT EXISTS transaction (
     note varchar(50),
     toAccountId varchar(50), 
     fromAccountId varchar(50),
+    imageUris TEXT,
+    location TEXT,
+    status TEXT NOT NULL,
     type INTEGER NOT NULL,
-    user INT(50) NOT NULL,
+    userId INT(50) NOT NULL,
     FOREIGN KEY (type) REFERENCES custom_field_type (id),
     FOREIGN KEY (toAccountId) REFERENCES wallet (id),
     FOREIGN KEY (fromAccountId) REFERENCES wallet (id),
     FOREIGN KEY (categoryId) REFERENCES category (id),
-    FOREIGN KEY (user) REFERENCES users (id)
+    FOREIGN KEY (userId) REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS custom_field_value(

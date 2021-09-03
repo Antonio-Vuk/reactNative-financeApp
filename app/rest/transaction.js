@@ -17,6 +17,21 @@ const insertTransactionRest = (transaction, customFields) => {
     );
 };
 
+const insertIncomingTransactionRest = (transaction, customFieldsValues) => {
+    return axios.post(
+        url + "transaction/incoming",
+        {
+            transaction,
+            customFieldsValues,
+        },
+        {
+            headers: {
+                "x-auth-token": defaultState.token,
+            },
+        }
+    );
+};
+
 const updateTransactionRest = (transaction, customFields) => {
     return axios.put(
         url + "transaction",
@@ -40,4 +55,9 @@ const deleteTransactionRest = (transactionId) => {
     });
 };
 
-export { insertTransactionRest, updateTransactionRest, deleteTransactionRest };
+export {
+    insertTransactionRest,
+    updateTransactionRest,
+    deleteTransactionRest,
+    insertIncomingTransactionRest,
+};
