@@ -86,6 +86,11 @@ const TransactionScreen = ({ route, navigation }) => {
                     setImageUris(JSON.parse(transaction.imageUris));
                 }
             }
+            if (template == true) {
+                setTitle("Edit Template");
+            }
+        } else if (template) {
+            setTitle("New Template");
         } else {
             setTitle("New Transaction");
             if (state.wallets.length > 0) {
@@ -203,7 +208,6 @@ const TransactionScreen = ({ route, navigation }) => {
                 await updateTransactionController(transaction);
                 successMessage("Transaction edited!");
                 route.params.callBack();
-                s;
             } else {
                 transaction.location = location;
                 await createTransactionController(transaction);

@@ -34,7 +34,7 @@ import { defaultState } from "../store/state";
 
 import { deleteTransactionController } from "../controllers/transactionController";
 import { ScrollView } from "react-native-gesture-handler";
-import MapView from "react-native-maps";
+import { EventEmitter } from "../myEvents";
 
 const TransactionScreen = ({ route, navigation }) => {
     const { state, setState } = useContext(AppContext);
@@ -54,7 +54,6 @@ const TransactionScreen = ({ route, navigation }) => {
     const [location, setLocation] = useState();
 
     useEffect(() => {
-        console.log("Setting...");
         if (defaultState.user != constants.offline) {
             setImageUris();
             if (Array.isArray(transaction.imageUris)) {
@@ -81,6 +80,7 @@ const TransactionScreen = ({ route, navigation }) => {
         }
         try {
             await deleteTransactionController(transaction, () => {
+                EventEmitter.emit(constants.myEvent);
                 setState({ ...defaultState });
                 navigation.pop();
             });

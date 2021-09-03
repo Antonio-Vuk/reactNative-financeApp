@@ -6,9 +6,18 @@ import {
     FlatList,
     TouchableOpacity,
     ScrollView,
+    Image,
 } from "react-native";
 import { AppContext } from "../contexts";
-import { COLORS, FONTS, icons, images, SIZES, STYLES } from "../constants";
+import {
+    COLORS,
+    constants,
+    FONTS,
+    icons,
+    images,
+    SIZES,
+    STYLES,
+} from "../constants";
 import { FontAwesome } from "@expo/vector-icons";
 import routes from "../navigation/routes";
 import { PieChartCategoryes } from "../components";
@@ -17,9 +26,20 @@ import {
     ballanceLast24Hours,
     totalBalance,
     getWalletBallance,
+    getCategory,
+    getWalletById,
+    showError,
+    successMessage,
 } from "../utils/helpersFunctions";
-import { unSetFieldsValuesLocalState } from "../store/customFieldsState";
+import {
+    setFieldsValuesLocalState,
+    unSetFieldsValuesLocalState,
+} from "../store/customFieldsState";
 import { defaultState } from "../store/state";
+import {
+    createFuturedTransactionController,
+    deleteTransactionController,
+} from "../controllers/transactionController";
 
 const HomeScreen = () => {
     const { state, setState } = useContext(AppContext);
@@ -40,15 +60,193 @@ const HomeScreen = () => {
             <ScrollView style={{ flex: 1 }}>
                 <RenderHeader setState={setState} />
                 {state.transactions.length > 0 && <PieChartCategoryes />}
-                <RenderIncomingTransactions setState={setState} />
+                <RenderIncomingTransactions state={state} setState={setState} />
                 <View style={{ height: 100 }}></View>
             </ScrollView>
         </View>
     );
 };
 
-const RenderIncomingTransactions = ({ setState }) => {
+const RenderIncomingTransactions = ({ state, setState }) => {
     const navigation = useNavigation();
+
+    const renderItem = ({ item, index }) => {
+        const category = getCategory(item.categoryId);
+
+        return (
+            <TouchableOpacity
+                style={{
+                    width: 300,
+                    marginRight: SIZES.padding,
+                    marginLeft: index == 0 ? SIZES.padding : 0,
+                    marginVertical: SIZES.radius,
+                    borderRadius: SIZES.radius,
+                    backgroundColor: COLORS.white,
+                    ...STYLES.shadow,
+                }}
+                onPress={() => {
+                    setFieldsValuesLocalState(item.id);
+                    setState({ ...defaultState });
+                    navigation.push(routes.editTransaction, {
+                        editMode: true,
+                        transaction: item,
+                        template: true,
+                        callBack: () => {},
+                    });
+                }}
+                onLongPress={async () => {
+                    if (defaultState.user != constants.offline) {
+                        defaultState.loading = true;
+                        setState({ ...defaultState });
+                    }
+                    try {
+                        await deleteTransactionController(item, () => {
+                            setState({ ...defaultState });
+                        });
+                    } catch (error) {
+                        showError(error);
+                    } finally {
+                        defaultState.loading = false;
+                        setState({ ...defaultState });
+                    }
+                }}
+            >
+                {/* Title */}
+                <View
+                    style={{
+                        flexDirection: "row",
+                        padding: SIZES.padding,
+                        alignItems: "center",
+                    }}
+                >
+                    <View
+                        style={{
+                            height: 50,
+                            width: 50,
+                            borderRadius: 25,
+                            backgroundColor: COLORS.lightGray,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginRight: SIZES.base,
+                        }}
+                    >
+                        <Image
+                            source={category.icon}
+                            style={{
+                                width: 30,
+                                height: 30,
+                                tintColor: category.color,
+                            }}
+                        ></Image>
+                    </View>
+                    <Text
+                        style={{
+                            ...FONTS.h3,
+                            color: category.color,
+                        }}
+                    >
+                        {category.name}
+                    </Text>
+                </View>
+
+                <View
+                    style={{
+                        paddingHorizontal: SIZES.padding,
+                        paddingBottom: SIZES.padding,
+                    }}
+                >
+                    <Text
+                        style={{
+                            ...FONTS.body3,
+                            flexWrap: "wrap",
+                            color: COLORS.darkgray,
+                        }}
+                    >
+                        Wallet:{" "}
+                        {item.toAccountId
+                            ? getWalletById(item.toAccountId).name
+                            : ""}
+                        {item.fromAccountId
+                            ? getWalletById(item.fromAccountId).name
+                            : ""}
+                    </Text>
+                    <Text
+                        style={{
+                            ...FONTS.body3,
+                            flexWrap: "wrap",
+                            color: COLORS.darkgray,
+                        }}
+                    >
+                        {item.note}
+                    </Text>
+                </View>
+
+                <TouchableOpacity
+                    style={{
+                        height: 50,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderBottomStartRadius: SIZES.radius,
+                        borderBottomEndRadius: SIZES.radius,
+                        backgroundColor:
+                            item.type == constants.income
+                                ? COLORS.lightgreen
+                                : COLORS.lightpink,
+                    }}
+                    onPress={async () => {
+                        if (defaultState.user != constants.offline) {
+                            defaultState.loading = true;
+                            setState({ ...defaultState });
+                        }
+                        try {
+                            const {
+                                type,
+                                amount,
+                                note,
+                                toAccountId,
+                                fromAccountId,
+                                categoryId,
+                            } = item;
+
+                            let transaction = {
+                                type,
+                                amount,
+                                note,
+                                toAccountId,
+                                fromAccountId,
+                                categoryId,
+                                date: new Date(),
+                                status: constants.processed,
+                            };
+                            await createFuturedTransactionController(
+                                transaction
+                            );
+                            successMessage("Transaction created!");
+                            setState({ ...defaultState });
+                        } catch (error) {
+                            showError(error);
+                        } finally {
+                            defaultState.loading = false;
+                            setState({ ...defaultState });
+                        }
+                    }}
+                >
+                    <Text
+                        style={{
+                            color:
+                                item.type == constants.income
+                                    ? COLORS.black
+                                    : COLORS.white,
+                            ...FONTS.body3,
+                        }}
+                    >
+                        CONFIRM {item.amount} {state.currency.currenciesCode}
+                    </Text>
+                </TouchableOpacity>
+            </TouchableOpacity>
+        );
+    };
+
     return (
         <View
             style={{
@@ -57,6 +255,7 @@ const RenderIncomingTransactions = ({ setState }) => {
                 margin: SIZES.padding,
             }}
         >
+            {/* Incoming transactions title */}
             <View
                 style={{
                     flexDirection: "row",
@@ -77,6 +276,18 @@ const RenderIncomingTransactions = ({ setState }) => {
                     <FontAwesome name="plus" size={30} color={COLORS.black} />
                 </TouchableOpacity>
             </View>
+            {state.transactions.filter((t) => t.status == constants.pending)
+                .length > 0 && (
+                <FlatList
+                    data={state.transactions.filter(
+                        (t) => t.status == constants.pending
+                    )}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => `${item.id}`}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                ></FlatList>
+            )}
         </View>
     );
 };

@@ -46,7 +46,8 @@ const TransactionsScreen = () => {
                 paddingTop: SIZES.statusBarHeight,
             }}
         >
-            {state.transactions.length > 0 && (
+            {state.transactions.filter((t) => t.status == constants.processed)
+                .length > 0 && (
                 <View
                     style={{
                         margin: SIZES.padding,
@@ -165,7 +166,12 @@ const TransactionList = ({ toDate, fromDate, category }) => {
                             <Text
                                 style={{ ...FONTS.body3, color: COLORS.gray }}
                             >
-                                Total: {state.transactions.length}
+                                Total:{" "}
+                                {
+                                    state.transactions.filter(
+                                        (t) => t.status == constants.processed
+                                    ).length
+                                }
                             </Text>
                         )}
                         <View />

@@ -267,6 +267,8 @@ const getChartData = (state, setData, wallet, time) => {
 
     transactions = filterTransactionsByDate(transactions, time);
 
+    transactions = transactions.filter((t) => t.status == constants.processed);
+
     transactions = transactions.sort((a, b) => {
         return new Date(a.date) > new Date(b.date);
     });

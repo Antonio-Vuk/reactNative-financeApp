@@ -6,6 +6,7 @@ import {
     insertCategorySQLite,
     updateWalletSQLite,
     deleteCustomFieldValuesByTransactionIdSQLite,
+    updateCategorySQLite,
 } from "../sqLite/sqliteFunctions";
 import {
     deleteCategoryState,
@@ -39,7 +40,7 @@ const insertCategoryController = async (category) => {
 const updateCategoryController = async (category) => {
     let success = false;
     if (defaultState.user == constants.offline) {
-        success = await updateWalletSQLite(category);
+        success = await updateCategorySQLite(category);
     } else {
         success = await updateCategoryRest(category);
     }

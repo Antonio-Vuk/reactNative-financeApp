@@ -6,7 +6,10 @@ import {
     deleteTransactionSQLite,
 } from "../sqLite/sqliteFunctions";
 
-import { createCustomFieldsValuesController } from "./customFieldsController";
+import {
+    createCustomFieldsValuesController,
+    createFeaturedCustomFieldsValuesController,
+} from "./customFieldsController";
 import {
     deleteTransactionState,
     insertTransactionState,
@@ -28,6 +31,26 @@ import {
     updateTransactionRest,
 } from "../rest/transaction";
 import { uploadImagesToFirebase } from "../firebase";
+
+const createFuturedTransactionController = async (_transaction) => {
+    const transaction = await setAndValidate(_transaction);
+
+    if (defaultState.user == constants.offline) {
+        let newTransaction = await createTransactionSQLite(transaction);
+        insertTransactionState(newTransaction);
+
+        let customs = defaultState.customFieldsValues;
+        customs.forEach((custom) => {
+            custom.transactionId = newTransaction.id;
+        });
+
+        const newCustomFieldsValues =
+            await createFeaturedCustomFieldsValuesController(customs);
+
+        saveTransactionCustomFieldsLocalState(newCustomFieldsValues);
+    } else {
+    }
+};
 
 const createTransactionController = async (_transaction) => {
     const transaction = await setAndValidate(_transaction);
@@ -186,4 +209,5 @@ export {
     createTransactionController,
     updateTransactionController,
     deleteTransactionController,
+    createFuturedTransactionController,
 };

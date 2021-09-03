@@ -19,7 +19,7 @@ const PieChartCategoryes = () => {
         chartData.reduce((a, b) => a + (b.expenseCount || 0), 0)
     );
     const [total, setTotal] = useState(
-        chartData.reduce((a, b) => +a + (+b.y || 0), 0)
+        chartData.reduce((a, b) => a + (b.y || 0), 0)
     );
     useEffect(() => {
         setChartData(processCategoryDataToDisplay(state, categoryType));
@@ -216,10 +216,12 @@ const processCategoryDataToDisplay = (state, categoryType) => {
         .map((category) => {
             let transactions = state.transactions.filter(
                 (item) =>
-                    item.categoryId == category.id && item.type == categoryType
+                    item.categoryId == category.id &&
+                    item.type == categoryType &&
+                    item.status == constants.processed
             );
 
-            var total = transactions.reduce((a, b) => a + (b.amount || 0), 0);
+            var total = transactions.reduce((a, b) => +a + (+b.amount || 0), 0);
 
             return {
                 name: category.name,

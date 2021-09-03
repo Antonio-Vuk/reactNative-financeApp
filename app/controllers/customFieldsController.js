@@ -202,6 +202,17 @@ const createCustomFieldsValuesController = async (
     return newFields;
 };
 
+const createFeaturedCustomFieldsValuesController = async (customs) => {
+    const newFields = [];
+    for (let index = 0; index < customs.length; index++) {
+        const newCustomFieldValue = await insertCustomFieldValueSQLite(
+            customs[index]
+        );
+        newFields.push(newCustomFieldValue);
+    }
+    return newFields;
+};
+
 export {
     createCustomFieldController,
     editCustomFieldNameController,
@@ -210,4 +221,5 @@ export {
     deleteCustomFieldListValueController,
     editCustomFieldListValueController,
     createCustomFieldsValuesController,
+    createFeaturedCustomFieldsValuesController,
 };

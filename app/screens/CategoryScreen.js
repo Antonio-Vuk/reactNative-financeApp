@@ -55,6 +55,7 @@ const CategoryScreen = ({ route, navigation }) => {
                     icon,
                     id: route.params.category.id,
                 };
+
                 await updateCategoryController(category);
             } else {
                 const category = {
@@ -65,8 +66,8 @@ const CategoryScreen = ({ route, navigation }) => {
                 };
                 await insertCategoryController(category);
             }
-            navigation.goBack();
             setState({ ...defaultState });
+            navigation.goBack();
         } catch (error) {
             showError(error);
         } finally {
