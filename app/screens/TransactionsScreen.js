@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     View,
     ScrollView,
+    Modal,
 } from "react-native";
 import { format } from "date-fns";
 
@@ -17,6 +18,8 @@ import {
     DeleteActionsSwipeable,
     AppExpander,
     AppDatePickerModal,
+    GoBackArrow,
+    AppPageTitle,
 } from "../components";
 import { AppContext } from "../contexts";
 import { COLORS, constants, FONTS, icons, SIZES, STYLES } from "../constants";
@@ -38,6 +41,47 @@ const TransactionsScreen = () => {
     const [category, setCategory] = useState(0);
     const [fromDate, setFromDate] = useState();
     const [toDate, setToDate] = useState();
+    const [transactions, setTransactions] = useState(state.transactions);
+
+    useEffect(() => {
+        filteredData();
+    }, [toDate, fromDate, category]);
+
+    useEffect(() => {
+        EventEmitter.on(constants.myEvent, filteredData);
+        return () => {
+            EventEmitter.removeListener(constants.myEvent, filteredData);
+        };
+    }, []);
+
+    const filteredData = () => {
+        let transactions = defaultState.transactions;
+
+        if (fromDate) {
+            transactions = transactions.filter(
+                (t) => new Date(t.date) >= fromDate
+            );
+        }
+
+        if (toDate) {
+            transactions = transactions.filter(
+                (t) => new Date(toDate) >= new Date(t.date)
+            );
+        }
+
+        transactions = transactions.filter(
+            (t) => t.categoryId == category || category == "0"
+        );
+
+        transactions = transactions.filter(
+            (t) => t.status == constants.processed
+        );
+
+        transactions = transactions.sort((a, b) => {
+            return new Date(a.date) < new Date(b.date);
+        });
+        setTransactions(transactions);
+    };
 
     return (
         <ScrollView
@@ -68,65 +112,200 @@ const TransactionsScreen = () => {
                     />
                 </View>
             )}
+            <CreateSummary transactions={transactions} />
             <TransactionList
-                toDate={toDate}
-                fromDate={fromDate}
-                category={category}
+                state={state}
+                setState={setState}
+                transactions={transactions}
+                filteredData={filteredData}
             />
         </ScrollView>
     );
 };
 export default TransactionsScreen;
 
-const TransactionList = ({ toDate, fromDate, category }) => {
-    const { state, setState } = useContext(AppContext);
-    const [transactions, setTransactions] = useState(state.transactions);
-    const navigation = useNavigation();
+const SummaryData = (transactions) => {
+    const data = {
+        incomes: [],
+        expenses: [],
+    };
+    let totalIncomes = 0;
+    let totalExpenses = 0;
 
-    useEffect(() => {
-        EventEmitter.on(constants.myEvent, filteredData);
-        return () => {
-            EventEmitter.removeListener(constants.myEvent, filteredData);
-        };
-    }, []);
+    defaultState.categories.forEach((category) => {
+        let totalIncome = 0;
+        let totalExpense = 0;
+
+        transactions.forEach((transaction) => {
+            if (transaction.categoryId == category.id) {
+                if (transaction.type == constants.income) {
+                    totalIncome = +totalIncome + +transaction.amount;
+                }
+                if (transaction.type == constants.expense) {
+                    totalExpense = +totalExpense + +transaction.amount;
+                }
+            }
+        });
+        if (totalIncome > 0) {
+            data.incomes.push({
+                category,
+                totalIncome,
+            });
+        }
+        if (totalExpense > 0) {
+            data.expenses.push({
+                category,
+                totalExpense,
+            });
+        }
+
+        totalIncomes = +totalIncomes + +totalIncome;
+        totalExpenses = +totalExpenses + +totalExpense;
+    });
+    data.totalExpenses = totalExpenses;
+    data.totalIncomes = totalIncomes;
+    data.result = +totalIncomes - +totalExpenses;
+    return data;
+};
+
+const CreateSummary = ({ transactions }) => {
+    const [modal, setModal] = useState(false);
+
+    const data = SummaryData(transactions);
+    const height = 40;
+
+    return (
+        <>
+            <Modal visible={modal} animationType={STYLES.animationType}>
+                <ScrollView
+                    style={{
+                        flex: 1,
+                        paddingTop: SIZES.statusBarHeight,
+                        paddingHorizontal: SIZES.padding,
+                    }}
+                >
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            height: SIZES.lineHeight,
+                        }}
+                    >
+                        <GoBackArrow onPress={() => setModal(false)} />
+                        <AppPageTitle title="Summary" />
+                        <View style={{ width: 50 }}></View>
+                    </View>
+
+                    <Text
+                        style={{
+                            ...FONTS.h2,
+                            height,
+                            color: COLORS.lightgreen,
+                        }}
+                    >
+                        Incomes:
+                    </Text>
+                    {data.incomes.map((income) => {
+                        return (
+                            <View
+                                key={income.category.id}
+                                style={{
+                                    flexDirection: "row",
+                                    height,
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Text style={{ flex: 1 }}>
+                                    {income.category.name}
+                                </Text>
+                                <Text style={{ ...FONTS.h3 }}>
+                                    {income.totalIncome}{" "}
+                                </Text>
+                                <Text style={{ color: COLORS.primary }}>
+                                    {defaultState.currency.currenciesCode}
+                                </Text>
+                            </View>
+                        );
+                    })}
+                    <AppDivider />
+                    <Text
+                        style={{
+                            ...FONTS.h2,
+                            height,
+                            color: COLORS.lightcoral,
+                        }}
+                    >
+                        Expenses:
+                    </Text>
+                    {data.expenses.map((expense) => {
+                        return (
+                            <View
+                                key={expense.category.id}
+                                style={{
+                                    flexDirection: "row",
+                                    height,
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Text style={{ flex: 1 }}>
+                                    {expense.category.name}
+                                </Text>
+                                <Text style={{ ...FONTS.h3 }}>
+                                    {expense.totalExpense}{" "}
+                                </Text>
+                                <Text style={{ color: COLORS.primary }}>
+                                    {defaultState.currency.currenciesCode}
+                                </Text>
+                            </View>
+                        );
+                    })}
+                    <AppDivider />
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            height,
+                            alignItems: "center",
+                        }}
+                    >
+                        <Text style={{ ...FONTS.h2, flex: 1 }}>
+                            Difference:
+                        </Text>
+                        <Text style={{ ...FONTS.h3 }}>{data.result} </Text>
+                        <Text style={{ color: COLORS.primary }}>
+                            {defaultState.currency.currenciesCode}
+                        </Text>
+                    </View>
+                </ScrollView>
+            </Modal>
+            <View
+                style={{
+                    flexDirection: "row",
+                    ...STYLES.container,
+                    ...STYLES.shadow,
+                    margin: SIZES.padding,
+                    alignItems: "center",
+                }}
+            >
+                <Text style={{ flex: 1, ...FONTS.h2 }}>Summary</Text>
+
+                <TouchableOpacity
+                    onPress={() => {
+                        setModal(true);
+                    }}
+                >
+                    <FontAwesome name="list" size={25} color={COLORS.black} />
+                </TouchableOpacity>
+            </View>
+        </>
+    );
+};
+
+const TransactionList = ({ state, setState, transactions, filteredData }) => {
+    const navigation = useNavigation();
 
     const displayMessage = () => {
         return state.transactions.length > 0
             ? "Transactions"
             : "No Transactions";
-    };
-
-    useEffect(() => {
-        filteredData();
-    }, [toDate, fromDate, category]);
-
-    const filteredData = () => {
-        let transactions = defaultState.transactions;
-
-        if (fromDate) {
-            transactions = transactions.filter(
-                (t) => new Date(t.date) >= fromDate
-            );
-        }
-
-        if (toDate) {
-            transactions = transactions.filter(
-                (t) => new Date(toDate) >= new Date(t.date)
-            );
-        }
-
-        transactions = transactions.filter(
-            (t) => t.categoryId == category || category == "0"
-        );
-
-        transactions = transactions.filter(
-            (t) => t.status == constants.processed
-        );
-
-        transactions = transactions.sort((a, b) => {
-            return new Date(a.date) < new Date(b.date);
-        });
-        setTransactions(transactions);
     };
 
     return (
