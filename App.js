@@ -13,15 +13,9 @@ import { getDataSQLite } from "./app/sqLite/sqliteFunctions";
 import { constants } from "./app/constants";
 import { ActivityIndicatorComponent } from "./app/components";
 import { getDataRest } from "./app/rest/data";
-// import * as firebase from "firebase";
-// import { firebaseConfig } from "./app/firebase";
 
 const App = () => {
     const [state, setState] = useState(defaultState);
-
-    // if (!firebase.default.apps.length) {
-    //     firebase.default.initializeApp(firebaseConfig);
-    // }
 
     const [loaded] = useFonts({
         "Roboto-Black": require("./app/assets/fonts/Roboto-Black.ttf"),

@@ -65,11 +65,7 @@ const queryDatabase = (myFunction, slqStatement, argsArray = []) => {
             (tx, error) => {
                 myFunction({ success: false, data: error.message });
             }
-        ),
-            (error) => {
-                console.log(error);
-            },
-            (success) => console.log(success);
+        );
     });
 };
 

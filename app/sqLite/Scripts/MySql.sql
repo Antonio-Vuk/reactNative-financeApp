@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS transaction (
     status TEXT NOT NULL,
     type INTEGER NOT NULL,
     userId INT(50) NOT NULL,
-    FOREIGN KEY (type) REFERENCES custom_field_type (id),
+    FOREIGN KEY (type) REFERENCES transaction_type (id),
     FOREIGN KEY (toAccountId) REFERENCES wallet (id),
     FOREIGN KEY (fromAccountId) REFERENCES wallet (id),
     FOREIGN KEY (categoryId) REFERENCES category (id),
