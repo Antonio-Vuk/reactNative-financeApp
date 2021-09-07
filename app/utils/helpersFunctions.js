@@ -85,11 +85,13 @@ const ballanceLast24Hours = () => {
         (transaction) => new Date(transaction.date) > today
     );
     transactions.forEach((transaction) => {
-        if (transaction.type == constants.income) {
-            ballance = +ballance + +transaction.amount;
-        }
-        if (transaction.type == constants.expense) {
-            ballance = +ballance - +transaction.amount;
+        if (transaction.status == constants.processed) {
+            if (transaction.type == constants.income) {
+                ballance = +ballance + +transaction.amount;
+            }
+            if (transaction.type == constants.expense) {
+                ballance = +ballance - +transaction.amount;
+            }
         }
     });
     return ballance;
@@ -105,22 +107,24 @@ const totalBalance = (state) => {
 const getWalletBallance = (wallet) => {
     let initialBallance = wallet.ballance;
     defaultState.transactions.forEach((transaction) => {
-        if (transaction.type == constants.income) {
-            if (transaction.toAccountId == wallet.id) {
-                initialBallance = +initialBallance + +transaction.amount;
+        if (transaction.status == constants.processed) {
+            if (transaction.type == constants.income) {
+                if (transaction.toAccountId == wallet.id) {
+                    initialBallance = +initialBallance + +transaction.amount;
+                }
             }
-        }
-        if (transaction.type == constants.expense) {
-            if (transaction.fromAccountId == wallet.id) {
-                initialBallance = +initialBallance - +transaction.amount;
+            if (transaction.type == constants.expense) {
+                if (transaction.fromAccountId == wallet.id) {
+                    initialBallance = +initialBallance - +transaction.amount;
+                }
             }
-        }
-        if (transaction.type == constants.transfer) {
-            if (transaction.fromAccountId == wallet.id) {
-                initialBallance = +initialBallance - +transaction.amount;
-            }
-            if (transaction.toAccountId == wallet.id) {
-                initialBallance = +initialBallance + +transaction.amount;
+            if (transaction.type == constants.transfer) {
+                if (transaction.fromAccountId == wallet.id) {
+                    initialBallance = +initialBallance - +transaction.amount;
+                }
+                if (transaction.toAccountId == wallet.id) {
+                    initialBallance = +initialBallance + +transaction.amount;
+                }
             }
         }
     });

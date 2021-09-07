@@ -2,6 +2,21 @@ import * as SQLite from "expo-sqlite";
 const db = SQLite.openDatabase("myDatabase");
 import { sql } from "./sqLiteSql";
 
+const queryDatabase = (myFunction, slqStatement, argsArray = []) => {
+    db.transaction((tx) => {
+        tx.executeSql(
+            slqStatement,
+            argsArray,
+            (tx, data) => {
+                myFunction({ success: true, data: data });
+            },
+            (tx, error) => {
+                myFunction({ success: false, data: error.message });
+            }
+        );
+    });
+};
+
 const updateCategorySequence = () => {
     db.exec(
         [{ sql: sql.updateCategorySequenceSql, args: [] }],
@@ -52,21 +67,6 @@ const dropTables = () => {
             console.log("Tables are delted");
         }
     );
-};
-
-const queryDatabase = (myFunction, slqStatement, argsArray = []) => {
-    db.transaction((tx) => {
-        tx.executeSql(
-            slqStatement,
-            argsArray,
-            (tx, data) => {
-                myFunction({ success: true, data: data });
-            },
-            (tx, error) => {
-                myFunction({ success: false, data: error.message });
-            }
-        );
-    });
 };
 
 const fetchData = (sql) => {

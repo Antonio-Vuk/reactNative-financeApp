@@ -194,7 +194,6 @@ const CreateSummary = ({ transactions }) => {
                         <AppPageTitle title="Summary" />
                         <View style={{ width: 50 }}></View>
                     </View>
-
                     <Text
                         style={{
                             ...FONTS.h2,
@@ -227,6 +226,21 @@ const CreateSummary = ({ transactions }) => {
                         );
                     })}
                     <AppDivider />
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            height,
+                            alignItems: "center",
+                        }}
+                    >
+                        <Text style={{ flex: 1 }}>Total </Text>
+                        <Text style={{ color: COLORS.green, ...FONTS.h3 }}>
+                            {data.totalIncomes}{" "}
+                        </Text>
+                        <Text style={{ color: COLORS.primary }}>
+                            {defaultState.currency.currenciesCode}
+                        </Text>
+                    </View>
                     <Text
                         style={{
                             ...FONTS.h2,
@@ -259,6 +273,21 @@ const CreateSummary = ({ transactions }) => {
                         );
                     })}
                     <AppDivider />
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            height,
+                            alignItems: "center",
+                        }}
+                    >
+                        <Text style={{ flex: 1 }}>Total </Text>
+                        <Text style={{ color: COLORS.red, ...FONTS.h3 }}>
+                            {data.totalExpenses}{" "}
+                        </Text>
+                        <Text style={{ color: COLORS.primary }}>
+                            {defaultState.currency.currenciesCode}
+                        </Text>
+                    </View>
                     <View
                         style={{
                             flexDirection: "row",

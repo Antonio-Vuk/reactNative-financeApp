@@ -21,8 +21,8 @@ import { getDataRest } from "../rest/data";
 const LoginScreen = () => {
     const { state, setState } = useContext(AppContext);
     const [checked, setChecked] = useState(true);
-    const [email, setUsername] = useState("a.vuk95@gmail.com");
-    const [password, setPassword] = useState("123456");
+    const [email, setUsername] = useState();
+    const [password, setPassword] = useState();
 
     const onLoginPress = async () => {
         defaultState.loading = true;

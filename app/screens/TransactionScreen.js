@@ -220,6 +220,7 @@ const TransactionScreen = ({ route, navigation }) => {
             setState({ ...defaultState });
             navigation.goBack();
         } catch (error) {
+            console.log(error);
             showError(error);
         } finally {
             defaultState.loading = false;

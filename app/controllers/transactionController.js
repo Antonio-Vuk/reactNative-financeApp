@@ -90,6 +90,7 @@ const createTransactionController = async (_transaction) => {
         );
         transaction.imageUris = JSON.stringify(imageUrisArray);
         const result = await insertTransactionRest(transaction, customs);
+
         if (result.data) {
             defaultState.transactions.push(result.data.transaction);
             defaultState.customFieldsValues =

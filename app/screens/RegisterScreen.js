@@ -10,8 +10,8 @@ import { showError, successMessage } from "../utils/helpersFunctions";
 import { KEYS, storeData } from "../storage";
 const RegisterScreen = ({ route }) => {
     const { state, setState } = useContext(AppContext);
-    const [email, setEmail] = useState("a.vuk95@gmail.com");
-    const [password, setPassword] = useState("123456");
+    const [email, setEmail] = useState();
+    const [password, setPassword] = useState();
     const [repeatPassword, setRepeatPassword] = useState("123456");
 
     const onRegisterPress = async () => {
