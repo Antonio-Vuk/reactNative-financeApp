@@ -25,7 +25,7 @@ const updateCategorySequence = () => {
     );
 };
 
-const createTables = () => {
+const createTablesSQLite = () => {
     db.exec(
         [
             { sql: sql.createCategoriesTableSql, args: [] },
@@ -43,7 +43,7 @@ const createTables = () => {
     );
 };
 
-const dropTables = () => {
+const dropTablesSQLite = () => {
     db.exec(
         [
             { sql: "DELETE from category", args: [] },
@@ -89,8 +89,8 @@ const importDataFromExcelSQLite = (
     customFieldsListValues,
     customFieldsValues
 ) => {
-    dropTables();
-    createTables();
+    dropTablesSQLite();
+    createTablesSQLite();
 
     categories.forEach((category) => {
         queryDatabase(({ success, data }) => {}, sql.insertCategorySql, [
@@ -158,8 +158,8 @@ const importDataFromExcelSQLite = (
 
 export {
     updateCategorySequence,
-    createTables,
-    dropTables,
+    createTablesSQLite,
+    dropTablesSQLite,
     queryDatabase,
     fetchData,
     importDataFromExcelSQLite,

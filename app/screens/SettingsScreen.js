@@ -10,7 +10,7 @@ import {
     ScrollView,
 } from "react-native";
 import { AppDivider, AppPageTitle, GoBackArrow } from "../components";
-import { createTables, dropTables } from "../sqLite/SQLiteDB";
+import { createTablesSQLite, dropTablesSQLite } from "../sqLite/SQLiteDB";
 import { SIZES, icons, STYLES, FONTS, COLORS, constants } from "../constants";
 import { defaultState, resetState } from "../store/state";
 import { currencyData } from "../utils/localStoredData";
@@ -34,6 +34,28 @@ import { deleteUserDataRest, importDataRest } from "../rest/data";
 const SettingsScreen = ({ navigation }) => {
     const { state, setState } = useContext(AppContext);
     const [currency, setCurrency] = useState(state.currency);
+
+    const deleteEverything = async () => {
+        try {
+            dropTablesSQLite();
+            createTablesSQLite();
+
+            if (defaultState.user != constants.offline) {
+                await deleteUserDataRest();
+            }
+
+            await storeData(KEYS.currency, JSON.stringify(currencyData[56]));
+            await storeData(KEYS.token, "");
+            await storeData(KEYS.user, constants.offline);
+            await storeData(KEYS.onBoarding, false);
+
+            resetState();
+            defaultState.onBoard = false;
+            setState({ ...defaultState });
+        } catch (error) {
+            showError(error);
+        }
+    };
 
     return (
         <View
@@ -123,35 +145,7 @@ const SettingsScreen = ({ navigation }) => {
                             <AppDivider />
                             <MainMenuListItem
                                 text="Reset everything"
-                                onPress={async () => {
-                                    try {
-                                        dropTables();
-                                        createTables();
-                                        if (
-                                            defaultState.user !=
-                                            constants.offline
-                                        ) {
-                                            await deleteUserDataRest();
-                                        }
-                                        await storeData(
-                                            KEYS.currency,
-                                            JSON.stringify(currencyData[56])
-                                        );
-                                        await storeData(KEYS.token, "");
-                                        await storeData(
-                                            KEYS.user,
-                                            constants.offline
-                                        );
-
-                                        resetState();
-                                        await storeData(KEYS.onBoarding, false);
-                                        defaultState.onBoard = false;
-
-                                        setState({ ...defaultState });
-                                    } catch (error) {
-                                        showError(error);
-                                    }
-                                }}
+                                onPress={deleteEverything}
                             />
                         </>
                     )}

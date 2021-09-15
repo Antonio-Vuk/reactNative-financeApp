@@ -12,7 +12,7 @@ const RegisterScreen = ({ route }) => {
     const { state, setState } = useContext(AppContext);
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
-    const [repeatPassword, setRepeatPassword] = useState("123456");
+    const [repeatPassword, setRepeatPassword] = useState();
 
     const onRegisterPress = async () => {
         if (password != repeatPassword || password == "") {

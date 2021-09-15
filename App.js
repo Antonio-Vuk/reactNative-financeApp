@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { AppNavigator, AuthNavigator } from "./app/navigation";
 import { useFonts } from "expo-font";
-import { LogBox, ActivityIndicator } from "react-native";
-import { createTables } from "./app/sqLite/SQLiteDB";
+import { LogBox } from "react-native";
+import { createTablesSQLite } from "./app/sqLite/SQLiteDB";
 import { defaultState, saveDataLocalState } from "./app/store/state";
 import { AppContext } from "./app/contexts";
-import { getData, KEYS, loadStorageData } from "./app/storage";
+import { loadStorageData } from "./app/storage";
 import FlashMessage from "react-native-flash-message";
 import { OnBoardingScreen } from "./app/screens";
 import { getDataSQLite } from "./app/sqLite/sqliteFunctions";
@@ -28,7 +28,7 @@ const App = () => {
             "with the same orientation - use another VirtualizedList-backed container instead.",
             "Non-serializable values were found in the navigation state.",
         ]);
-        createTables();
+        createTablesSQLite();
     }, []);
 
     useEffect(() => {
