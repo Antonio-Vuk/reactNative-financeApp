@@ -29,6 +29,7 @@ const getDataSQLite = () => {
 };
 
 // Categories section
+
 const insertCategorySQLite = ({ name, type, color, icon }) => {
     return new Promise((resolve, reject) => {
         let newId = generateId();

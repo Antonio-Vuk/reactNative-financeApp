@@ -56,27 +56,22 @@ const TransactionsScreen = () => {
 
     const filteredData = () => {
         let transactions = defaultState.transactions;
-
         if (fromDate) {
             transactions = transactions.filter(
                 (t) => new Date(t.date) >= fromDate
             );
         }
-
         if (toDate) {
             transactions = transactions.filter(
                 (t) => new Date(toDate) >= new Date(t.date)
             );
         }
-
         transactions = transactions.filter(
             (t) => t.categoryId == category || category == "0"
         );
-
         transactions = transactions.filter(
             (t) => t.status == constants.processed
         );
-
         transactions = transactions.sort((a, b) => {
             return new Date(a.date) < new Date(b.date);
         });
@@ -128,6 +123,9 @@ const SummaryData = (transactions) => {
     const data = {
         incomes: [],
         expenses: [],
+        totalExpenses: 0,
+        totalIncomes: 0,
+        result: 0,
     };
     let totalIncomes = 0;
     let totalExpenses = 0;

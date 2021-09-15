@@ -253,8 +253,8 @@ const getChartData = (state, setData, wallet, time) => {
         selectedWallet = wallets[0];
         initialBalance = selectedWallet.ballance;
     }
-    let transactions = [];
 
+    let transactions = [];
     if (wallet == constants.all) {
         transactions = state.transactions;
     } else {
@@ -266,14 +266,13 @@ const getChartData = (state, setData, wallet, time) => {
     }
 
     transactions = filterTransactionsByDate(transactions, time);
-
     transactions = transactions.filter((t) => t.status == constants.processed);
-
     transactions = transactions.sort((a, b) => {
         return new Date(a.date) > new Date(b.date);
     });
-    let newData = [];
-    transactions.forEach((transaction) => {
+
+    let chartData = [];
+    transactions.forEach((transaction, index) => {
         if (wallet == constants.all) {
             if (transaction.type == constants.income) {
                 initialBalance = +initialBalance + +transaction.amount;
@@ -289,16 +288,12 @@ const getChartData = (state, setData, wallet, time) => {
                 initialBalance = +initialBalance - +transaction.amount;
             }
         }
-        newData.push(initialBalance);
-    });
-    let myData = [];
-    newData.forEach((d, index) => {
-        myData.push({
+        chartData.push({
             x: index + 1,
-            y: d,
+            y: initialBalance,
         });
     });
-    setData(myData);
+    setData(chartData);
 };
 
 const getWallChartWallet = (state) => {
