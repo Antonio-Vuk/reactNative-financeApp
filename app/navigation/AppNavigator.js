@@ -49,7 +49,14 @@ const AppNavigator = () => {
                             color={focused ? COLORS.white : COLORS.primary}
                         />
                     ),
-                    tabBarButton: (props) => <TabBarCustomButton {...props} />,
+                    tabBarButton: (props) => (
+                        <TabBarCustomButton
+                            {...props}
+                            onCustomPress={() => {
+                                EventEmitter.emit(constants.tabChangedEvent);
+                            }}
+                        />
+                    ),
                 }}
             />
             <Tab.Screen
@@ -68,6 +75,7 @@ const AppNavigator = () => {
                             {...props}
                             onCustomPress={() => {
                                 EventEmitter.emit(constants.myEvent);
+                                EventEmitter.emit(constants.tabChangedEvent);
                             }}
                         />
                     ),
@@ -88,7 +96,9 @@ const AppNavigator = () => {
                     tabBarButton: (props) => (
                         <TabBarCustomButton
                             {...props}
-                            onCustomPress={() => {}}
+                            onCustomPress={() => {
+                                EventEmitter.emit(constants.tabChangedEvent);
+                            }}
                         />
                     ),
                 }}
@@ -107,7 +117,9 @@ const AppNavigator = () => {
                     tabBarButton: (props) => (
                         <TabBarCustomButton
                             {...props}
-                            onCustomPress={() => {}}
+                            onCustomPress={() => {
+                                EventEmitter.emit(constants.tabChangedEvent);
+                            }}
                         />
                     ),
                 }}

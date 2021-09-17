@@ -40,6 +40,7 @@ import {
 } from "../store/customFieldsState";
 import { deleteTransactionController } from "../controllers/transactionController";
 import { EventEmitter } from "../myEvents";
+import TransactionNavigator from "../navigation/TransactionNavigator";
 
 const TransactionsScreen = () => {
     const { state, setState } = useContext(AppContext);
@@ -47,6 +48,7 @@ const TransactionsScreen = () => {
     const [fromDate, setFromDate] = useState();
     const [toDate, setToDate] = useState();
     const [transactions, setTransactions] = useState(state.transactions);
+    const navigation = useNavigation();
 
     useEffect(() => {
         filteredData();
@@ -58,6 +60,23 @@ const TransactionsScreen = () => {
             EventEmitter.removeListener(constants.myEvent, filteredData);
         };
     }, []);
+
+    // useEffect(() => {
+    //     EventEmitter.on(constants.tabChangedEvent, navigationHandler);
+    //     return () => {
+    //         EventEmitter.removeListener(
+    //             constants.tabChangedEvent,
+    //             navigationHandler
+    //         );
+    //     };
+    // }, []);
+
+    // const navigationHandler = () => {
+    //     navigation.reset({
+    //         index: 0,
+    //         routes: [{ name: routes.transactions }],
+    //     });
+    // };
 
     const filteredData = () => {
         let transactions = defaultState.transactions;
@@ -602,7 +621,7 @@ const DateFilters = ({ fromDate, setFromDate, toDate, setToDate }) => {
                     height: SIZES.lineHeight,
                 }}
             >
-                <Text style={{ ...FONTS.h3 }}>From date:</Text>
+                <Text style={{ ...FONTS.h3 }}>To date:</Text>
                 <AppExpander />
                 {toDate != undefined && (
                     <>

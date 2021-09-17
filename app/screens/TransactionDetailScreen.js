@@ -54,6 +54,20 @@ const TransactionScreen = ({ route, navigation }) => {
     const [location, setLocation] = useState();
 
     useEffect(() => {
+        EventEmitter.on(constants.tabChangedEvent, navigationHandler);
+        return () => {
+            EventEmitter.removeListener(
+                constants.tabChangedEvent,
+                navigationHandler
+            );
+        };
+    }, []);
+
+    const navigationHandler = () => {
+        navigation.popToTop();
+    };
+
+    useEffect(() => {
         if (defaultState.user != constants.offline) {
             setImageUris();
             if (Array.isArray(transaction.imageUris)) {

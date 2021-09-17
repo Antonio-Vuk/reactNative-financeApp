@@ -68,58 +68,62 @@ const importData = async (state, setState) => {
                         const data = XLSX.utils.sheet_to_json(ws, {
                             header: 1,
                         });
+                        if (data.length > 0) {
+                            var idIndex = data[0].findIndex(
+                                (item) => item == "id"
+                            );
+                            const amountIndex = data[0].findIndex(
+                                (item) => item == "amount"
+                            );
+                            var typeIndex = data[0].findIndex(
+                                (item) => item == "type"
+                            );
+                            const dateIndex = data[0].findIndex(
+                                (item) => item == "date"
+                            );
+                            const categoryIdIndex = data[0].findIndex(
+                                (item) => item == "categoryId"
+                            );
+                            const noteIndex = data[0].findIndex(
+                                (item) => item == "note"
+                            );
+                            const toAccountIdIndex = data[0].findIndex(
+                                (item) => item == "toAccountId"
+                            );
+                            const fromAccountIdIndex = data[0].findIndex(
+                                (item) => item == "fromAccountId"
+                            );
+                            const imageUrisIdIndex = data[0].findIndex(
+                                (item) => item == "imageUris"
+                            );
+                            const statusIdIndex = data[0].findIndex(
+                                (item) => item == "status"
+                            );
+                            const locationIdIndex = data[0].findIndex(
+                                (item) => item == "location"
+                            );
 
-                        var idIndex = data[0].findIndex((item) => item == "id");
-                        const amountIndex = data[0].findIndex(
-                            (item) => item == "amount"
-                        );
-                        var typeIndex = data[0].findIndex(
-                            (item) => item == "type"
-                        );
-                        const dateIndex = data[0].findIndex(
-                            (item) => item == "date"
-                        );
-                        const categoryIdIndex = data[0].findIndex(
-                            (item) => item == "categoryId"
-                        );
-                        const noteIndex = data[0].findIndex(
-                            (item) => item == "note"
-                        );
-                        const toAccountIdIndex = data[0].findIndex(
-                            (item) => item == "toAccountId"
-                        );
-                        const fromAccountIdIndex = data[0].findIndex(
-                            (item) => item == "fromAccountId"
-                        );
-                        const imageUrisIdIndex = data[0].findIndex(
-                            (item) => item == "imageUris"
-                        );
-                        const statusIdIndex = data[0].findIndex(
-                            (item) => item == "status"
-                        );
-                        const locationIdIndex = data[0].findIndex(
-                            (item) => item == "location"
-                        );
+                            data.forEach((element, index) => {
+                                if (index > 0) {
+                                    var imported = {
+                                        id: element[idIndex],
+                                        type: element[typeIndex],
+                                        amount: element[amountIndex],
+                                        date: new Date(element[dateIndex]),
+                                        categoryId: element[categoryIdIndex],
+                                        note: element[noteIndex],
+                                        toAccountId: element[toAccountIdIndex],
+                                        fromAccountId:
+                                            element[fromAccountIdIndex],
+                                        imageUris: element[imageUrisIdIndex],
+                                        status: element[statusIdIndex],
+                                        location: element[locationIdIndex],
+                                    };
 
-                        data.forEach((element, index) => {
-                            if (index > 0) {
-                                var imported = {
-                                    id: element[idIndex],
-                                    type: element[typeIndex],
-                                    amount: element[amountIndex],
-                                    date: new Date(element[dateIndex]),
-                                    categoryId: element[categoryIdIndex],
-                                    note: element[noteIndex],
-                                    toAccountId: element[toAccountIdIndex],
-                                    fromAccountId: element[fromAccountIdIndex],
-                                    imageUris: element[imageUrisIdIndex],
-                                    status: element[statusIdIndex],
-                                    location: element[locationIdIndex],
-                                };
-
-                                transactions.push(imported);
-                            }
-                        });
+                                    transactions.push(imported);
+                                }
+                            });
+                        }
 
                         // Categoryes
                         const wsname2 = wb.SheetNames[1];
@@ -128,35 +132,37 @@ const importData = async (state, setState) => {
                             header: 1,
                         });
 
-                        var idIndex = data2[0].findIndex(
-                            (item) => item == "id"
-                        );
-                        var nameIndex = data2[0].findIndex(
-                            (item) => item == "name"
-                        );
+                        if (data2.length > 0) {
+                            var idIndex = data2[0].findIndex(
+                                (item) => item == "id"
+                            );
+                            var nameIndex = data2[0].findIndex(
+                                (item) => item == "name"
+                            );
 
-                        typeIndex = data2[0].findIndex(
-                            (item) => item == "type"
-                        );
+                            typeIndex = data2[0].findIndex(
+                                (item) => item == "type"
+                            );
 
-                        var colorIndex = data2[0].findIndex(
-                            (item) => item == "color"
-                        );
-                        var iconIndex = data2[0].findIndex(
-                            (item) => item == "icon"
-                        );
+                            var colorIndex = data2[0].findIndex(
+                                (item) => item == "color"
+                            );
+                            var iconIndex = data2[0].findIndex(
+                                (item) => item == "icon"
+                            );
 
-                        data2.forEach((element, index) => {
-                            if (index > 0) {
-                                categories.push({
-                                    id: element[idIndex],
-                                    name: element[nameIndex],
-                                    type: element[typeIndex],
-                                    color: element[colorIndex],
-                                    icon: element[iconIndex],
-                                });
-                            }
-                        });
+                            data2.forEach((element, index) => {
+                                if (index > 0) {
+                                    categories.push({
+                                        id: element[idIndex],
+                                        name: element[nameIndex],
+                                        type: element[typeIndex],
+                                        color: element[colorIndex],
+                                        icon: element[iconIndex],
+                                    });
+                                }
+                            });
+                        }
 
                         // Wallets
 
@@ -166,31 +172,33 @@ const importData = async (state, setState) => {
                             header: 1,
                         });
 
-                        var idIndex = data3[0].findIndex(
-                            (item) => item == "id"
-                        );
-                        var nameIndex = data3[0].findIndex(
-                            (item) => item == "name"
-                        );
+                        if (data3.length > 0) {
+                            var idIndex = data3[0].findIndex(
+                                (item) => item == "id"
+                            );
+                            var nameIndex = data3[0].findIndex(
+                                (item) => item == "name"
+                            );
 
-                        ballanceIndex = data3[0].findIndex(
-                            (item) => item == "ballance"
-                        );
+                            ballanceIndex = data3[0].findIndex(
+                                (item) => item == "ballance"
+                            );
 
-                        var colorIndex = data3[0].findIndex(
-                            (item) => item == "color"
-                        );
+                            var colorIndex = data3[0].findIndex(
+                                (item) => item == "color"
+                            );
 
-                        data3.forEach((element, index) => {
-                            if (index > 0) {
-                                wallets.push({
-                                    id: element[idIndex],
-                                    name: element[nameIndex],
-                                    ballance: element[ballanceIndex],
-                                    color: element[colorIndex],
-                                });
-                            }
-                        });
+                            data3.forEach((element, index) => {
+                                if (index > 0) {
+                                    wallets.push({
+                                        id: element[idIndex],
+                                        name: element[nameIndex],
+                                        ballance: element[ballanceIndex],
+                                        color: element[colorIndex],
+                                    });
+                                }
+                            });
+                        }
 
                         // Custom Fields
 
@@ -199,32 +207,33 @@ const importData = async (state, setState) => {
                         const data4 = XLSX.utils.sheet_to_json(ws4, {
                             header: 1,
                         });
+                        if (data4.length > 0) {
+                            var idIndex = data4[0].findIndex(
+                                (item) => item == "id"
+                            );
+                            var nameIndex = data4[0].findIndex(
+                                (item) => item == "name"
+                            );
 
-                        var idIndex = data4[0].findIndex(
-                            (item) => item == "id"
-                        );
-                        var nameIndex = data4[0].findIndex(
-                            (item) => item == "name"
-                        );
+                            var categoryIndex = data4[0].findIndex(
+                                (item) => item == "category"
+                            );
 
-                        var categoryIndex = data4[0].findIndex(
-                            (item) => item == "category"
-                        );
+                            var typeIndex = data4[0].findIndex(
+                                (item) => item == "type"
+                            );
 
-                        var typeIndex = data4[0].findIndex(
-                            (item) => item == "type"
-                        );
-
-                        data4.forEach((element, index) => {
-                            if (index > 0) {
-                                customFilds.push({
-                                    id: element[idIndex],
-                                    name: element[nameIndex],
-                                    category: element[categoryIndex],
-                                    type: element[typeIndex],
-                                });
-                            }
-                        });
+                            data4.forEach((element, index) => {
+                                if (index > 0) {
+                                    customFilds.push({
+                                        id: element[idIndex],
+                                        name: element[nameIndex],
+                                        category: element[categoryIndex],
+                                        type: element[typeIndex],
+                                    });
+                                }
+                            });
+                        }
 
                         // CustomFieldListValues
 
@@ -234,27 +243,29 @@ const importData = async (state, setState) => {
                             header: 1,
                         });
 
-                        var idIndex = data5[0].findIndex(
-                            (item) => item == "id"
-                        );
-                        var customFieldIdIndex = data5[0].findIndex(
-                            (item) => item == "customFieldId"
-                        );
+                        if (data5.length > 0) {
+                            var idIndex = data5[0].findIndex(
+                                (item) => item == "id"
+                            );
+                            var customFieldIdIndex = data5[0].findIndex(
+                                (item) => item == "customFieldId"
+                            );
 
-                        var valueIndex = data5[0].findIndex(
-                            (item) => item == "value"
-                        );
+                            var valueIndex = data5[0].findIndex(
+                                (item) => item == "value"
+                            );
 
-                        data5.forEach((element, index) => {
-                            if (index > 0) {
-                                customFieldsListValues.push({
-                                    id: element[idIndex],
-                                    customFieldId: element[customFieldIdIndex],
-                                    value: element[valueIndex],
-                                });
-                            }
-                        });
-
+                            data5.forEach((element, index) => {
+                                if (index > 0) {
+                                    customFieldsListValues.push({
+                                        id: element[idIndex],
+                                        customFieldId:
+                                            element[customFieldIdIndex],
+                                        value: element[valueIndex],
+                                    });
+                                }
+                            });
+                        }
                         // CustomFieldsValues
 
                         const wsname6 = wb.SheetNames[5];
@@ -263,31 +274,35 @@ const importData = async (state, setState) => {
                             header: 1,
                         });
 
-                        var idIndex = data6[0].findIndex(
-                            (item) => item == "id"
-                        );
-                        var customFieldIdIndex = data6[0].findIndex(
-                            (item) => item == "customFieldId"
-                        );
+                        if (data6.length > 0) {
+                            var idIndex = data6[0].findIndex(
+                                (item) => item == "id"
+                            );
+                            var customFieldIdIndex = data6[0].findIndex(
+                                (item) => item == "customFieldId"
+                            );
 
-                        var valueIndex = data6[0].findIndex(
-                            (item) => item == "value"
-                        );
+                            var valueIndex = data6[0].findIndex(
+                                (item) => item == "value"
+                            );
 
-                        var transactionIdIndex = data6[0].findIndex(
-                            (item) => item == "transactionId"
-                        );
+                            var transactionIdIndex = data6[0].findIndex(
+                                (item) => item == "transactionId"
+                            );
 
-                        data6.forEach((element, index) => {
-                            if (index > 0) {
-                                customFieldsValues.push({
-                                    id: element[idIndex],
-                                    customFieldId: element[customFieldIdIndex],
-                                    value: element[valueIndex],
-                                    transactionId: element[transactionIdIndex],
-                                });
-                            }
-                        });
+                            data6.forEach((element, index) => {
+                                if (index > 0) {
+                                    customFieldsValues.push({
+                                        id: element[idIndex],
+                                        customFieldId:
+                                            element[customFieldIdIndex],
+                                        value: element[valueIndex],
+                                        transactionId:
+                                            element[transactionIdIndex],
+                                    });
+                                }
+                            });
+                        }
 
                         const dataToImport = {
                             transactions,
@@ -297,6 +312,7 @@ const importData = async (state, setState) => {
                             customFieldsListValues,
                             customFieldsValues,
                         };
+                        console.log(dataToImport);
 
                         if (defaultState.user == constants.offline) {
                             importDataFromExcelSQLite(dataToImport);

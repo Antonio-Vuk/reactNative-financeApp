@@ -14,6 +14,7 @@ const all = "All";
 const pending = "Pending";
 const processed = "Processed";
 const myEvent = "reRenderList";
+const tabChangedEvent = "tabChangedEvent";
 
 export default {
     zero,
@@ -32,4 +33,5 @@ export default {
     pending,
     processed,
     myEvent,
+    tabChangedEvent,
 };

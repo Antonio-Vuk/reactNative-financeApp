@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import {
     ImageBackground,
     View,
@@ -41,9 +41,28 @@ import {
     deleteTransactionController,
 } from "../controllers/transactionController";
 import useLocation from "../hooks/useLocation";
+import EventEmitter from "react-native-eventemitter";
 
 const HomeScreen = () => {
     const { state, setState } = useContext(AppContext);
+    const navigation = useNavigation();
+
+    // useEffect(() => {
+    //     EventEmitter.on(constants.tabChangedEvent, navigationHandler);
+    //     return () => {
+    //         EventEmitter.removeListener(
+    //             constants.tabChangedEvent,
+    //             navigationHandler
+    //         );
+    //     };
+    // }, []);
+
+    // const navigationHandler = () => {
+    //     navigation.reset({
+    //         index: 0,
+    //         routes: [{ name: routes.home }],
+    //     });
+    // };
 
     return (
         <View style={{ flex: 1 }}>

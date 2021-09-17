@@ -53,7 +53,7 @@ const getWalletById = (id) => {
         var wallet = arrayWallet[0];
         return wallet;
     }
-    return undefined;
+    return {};
 };
 
 const getWalletNameById = (id) => {
