@@ -81,14 +81,14 @@ const fetchData = (sql) => {
     });
 };
 
-const importDataFromExcelSQLite = (
+const importDataFromExcelSQLite = ({
     transactions,
     categories,
     wallets,
-    customFields,
+    customFilds,
     customFieldsListValues,
-    customFieldsValues
-) => {
+    customFieldsValues,
+}) => {
     dropTablesSQLite();
     createTablesSQLite();
 
@@ -121,7 +121,7 @@ const importDataFromExcelSQLite = (
         ]);
     });
 
-    customFields.forEach((customField) => {
+    customFilds.forEach((customField) => {
         queryDatabase(({ success, data }) => {}, sql.insertCustomFieldSql, [
             customField.id,
             customField.name,

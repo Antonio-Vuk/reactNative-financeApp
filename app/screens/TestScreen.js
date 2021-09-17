@@ -226,6 +226,7 @@ const TimeSelector = ({ timeArray, setTime, time }) => {
 
 const filterTransactionsByDate = (transactions, time) => {
     var d = new Date();
+    transactions = transactions.filter((t) => t.status == constants.processed);
 
     if (time == "7 days") {
         d.setDate(d.getDate() - 7);
@@ -264,6 +265,7 @@ const getChartData = (state, setData, wallet, time) => {
                 a.fromAccountId == selectedWallet.id
         );
     }
+    transactions = transactions.filter((t) => t.status == constants.processed);
 
     transactions = filterTransactionsByDate(transactions, time);
     transactions = transactions.filter((t) => t.status == constants.processed);

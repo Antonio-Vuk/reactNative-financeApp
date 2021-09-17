@@ -150,28 +150,46 @@ const TransactionScreen = ({ route, navigation }) => {
                                 flexDirection: "row",
                             }}
                         >
-                            <View
-                                style={{
-                                    alignItems: "center",
-                                }}
-                            >
-                                <Image
-                                    source={getCategory(categoryId).icon}
+                            {type != constants.transfer && (
+                                <View
                                     style={{
-                                        width: 50,
-                                        height: 50,
-                                        marginRight: 10,
-                                    }}
-                                />
-                                <Text
-                                    style={{
-                                        fontSize: 20,
-                                        fontWeight: "bold",
+                                        alignItems: "center",
                                     }}
                                 >
-                                    {getCategory(categoryId).name}
-                                </Text>
-                            </View>
+                                    <Image
+                                        source={getCategory(categoryId).icon}
+                                        style={{
+                                            width: 50,
+                                            height: 50,
+                                            marginRight: 10,
+                                        }}
+                                    />
+                                    <Text
+                                        style={{
+                                            fontSize: 20,
+                                            fontWeight: "bold",
+                                        }}
+                                    >
+                                        {getCategory(categoryId).name}
+                                    </Text>
+                                </View>
+                            )}
+                            {type == constants.transfer && (
+                                <View
+                                    style={{
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            fontSize: 20,
+                                            fontWeight: "bold",
+                                        }}
+                                    >
+                                        Transfer
+                                    </Text>
+                                </View>
+                            )}
                             <AppExpander />
                             <View
                                 style={{

@@ -1,5 +1,5 @@
 import React from "react";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import { SIZES } from "../constants";
 
 const LocationViewer = ({ location }) => {
@@ -20,7 +20,15 @@ const LocationViewer = ({ location }) => {
                         height: SIZES.windowWidth - 50,
                         borderRadius: 30,
                     }}
-                />
+                >
+                    <Marker
+                        coordinate={{
+                            latitude: location.latitude,
+                            longitude: location.longitude,
+                        }}
+                        title="Transaction place"
+                    ></Marker>
+                </MapView>
             )}
         </>
     );

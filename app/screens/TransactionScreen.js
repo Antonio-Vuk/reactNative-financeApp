@@ -134,7 +134,9 @@ const TransactionScreen = ({ route, navigation }) => {
                 }
             }
         } else {
-            setCategoryId(getCategoryHF(type));
+            if (editMode != true) {
+                setCategoryId(getCategoryHF(type));
+            }
         }
     }, [type]);
 
@@ -146,19 +148,32 @@ const TransactionScreen = ({ route, navigation }) => {
         setImageUris(imageUris.filter((imageUri) => imageUri != uri));
     };
 
+    const validateCustomFields = () => {
+        const fields = [];
+        defaultState.customFields.forEach((custom) => {
+            if (categoryId == custom.category || custom.category == 0) {
+                if (custom.value != undefined) {
+                    fields.push(custom);
+                }
+            }
+        });
+        fields.forEach((custom) => {
+            if (custom.type == constants.number) {
+                if (isNumeric(custom.value) == false) {
+                    throw "Custom field type number must be numeric!";
+                }
+            }
+        });
+    };
+
     const handleSave = async () => {
         if (defaultState.user != constants.offline) {
             defaultState.loading = true;
             setState({ ...defaultState });
         }
         try {
-            defaultState.customFields.forEach((custom) => {
-                if (custom.type == constants.number) {
-                    if (isNumeric(custom.value) == false) {
-                        throw "Custom field type number must be numeric!";
-                    }
-                }
-            });
+            validateCustomFields();
+
             if (categoryId == undefined) {
                 throw "Category is not selected!";
             }

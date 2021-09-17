@@ -138,7 +138,9 @@ const SettingsScreen = ({ navigation }) => {
                             />
                         }
                         text="Import data from excel"
-                        onPress={() => importData(state, setState)}
+                        onPress={() => {
+                            importData(state, setState);
+                        }}
                     />
                     {true && (
                         <>

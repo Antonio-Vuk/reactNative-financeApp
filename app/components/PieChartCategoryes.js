@@ -4,6 +4,7 @@ import { VictoryPie } from "victory-native";
 import { constants, SIZES, STYLES, FONTS, COLORS, icons } from "../constants";
 import { AppContext } from "../contexts";
 import { FontAwesome } from "@expo/vector-icons";
+import { EventEmitter } from "../myEvents";
 
 const PieChartCategoryes = () => {
     const { state, setState } = useContext(AppContext);
@@ -21,7 +22,19 @@ const PieChartCategoryes = () => {
     const [total, setTotal] = useState(
         chartData.reduce((a, b) => a + (b.y || 0), 0)
     );
+
     useEffect(() => {
+        EventEmitter.on(constants.myEvent, setPieChartData);
+        return () => {
+            EventEmitter.removeListener(constants.myEvent, setPieChartData);
+        };
+    }, []);
+
+    useEffect(() => {
+        setPieChartData();
+    }, [state.transactions, categoryType]);
+
+    const setPieChartData = () => {
         setChartData(processCategoryDataToDisplay(state, categoryType));
         setColorScale(
             processCategoryDataToDisplay(state, categoryType).map(
@@ -40,7 +53,7 @@ const PieChartCategoryes = () => {
                 0
             )
         );
-    }, [state.transactions, categoryType]);
+    };
     return (
         <View
             style={{

@@ -23,7 +23,12 @@ import {
 } from "../components";
 import { AppContext } from "../contexts";
 import { COLORS, constants, FONTS, icons, SIZES, STYLES } from "../constants";
-import { getCategory, showError, subString } from "../utils/helpersFunctions";
+import {
+    getCategory,
+    getWalletNameById,
+    showError,
+    subString,
+} from "../utils/helpersFunctions";
 import routes from "../navigation/routes";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 
@@ -450,18 +455,31 @@ const RenderListItem = (
                         });
                     }}
                 >
-                    <Image
-                        source={category.icon}
-                        style={{
-                            width: 35,
-                            height: 35,
-                            tintColor: category.color,
-                        }}
-                    />
+                    {item.type != constants.transfer && (
+                        <Image
+                            source={category.icon}
+                            style={{
+                                width: 35,
+                                height: 35,
+                                tintColor: category.color,
+                            }}
+                        />
+                    )}
                     <View style={{ flex: 1, marginLeft: SIZES.radius }}>
-                        <Text style={{ ...FONTS.h3 }}>{category.name}</Text>
+                        {item.type != constants.transfer && (
+                            <Text style={{ ...FONTS.h3 }}>{category.name}</Text>
+                        )}
+                        {item.type == constants.transfer && (
+                            <Text style={{ ...FONTS.h3 }}>Transfer</Text>
+                        )}
                         {item.note != "" && (
                             <Text>{subString(item.note, 20)}</Text>
+                        )}
+                        {item.type == constants.transfer && (
+                            <Text>
+                                {getWalletNameById(item.fromAccountId)} {" -> "}
+                                {getWalletNameById(item.toAccountId)}
+                            </Text>
                         )}
                         <Text style={{ color: COLORS.gray, ...FONTS.body4 }}>
                             {format(new Date(item?.date), "yyyy MMM dd - H:MM")}

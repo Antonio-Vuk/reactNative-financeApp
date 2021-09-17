@@ -269,7 +269,9 @@ const RenderCustomListCell = ({ item }) => {
                             }}
                         >
                             <FlatList
-                                data={state.customFieldsListValues}
+                                data={state.customFieldsListValues.filter(
+                                    (field) => field.customFieldId == item.id
+                                )}
                                 keyboardShouldPersistTaps="handled"
                                 keyExtractor={(item) => item.id.toString()}
                                 ItemSeparatorComponent={() => <AppDivider />}

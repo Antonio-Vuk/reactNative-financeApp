@@ -6,6 +6,7 @@ import { importDataFromExcelSQLite, fetchData } from "../sqLite/SQLiteDB";
 import { showError, successMessage } from "./helpersFunctions";
 import { defaultState } from "../store/state";
 import { constants } from "../constants";
+import { importDataRest } from "../rest/data";
 
 const exportData = async (state) => {
     var wb = XLSX.utils.book_new();
@@ -90,6 +91,15 @@ const importData = async (state, setState) => {
                         const fromAccountIdIndex = data[0].findIndex(
                             (item) => item == "fromAccountId"
                         );
+                        const imageUrisIdIndex = data[0].findIndex(
+                            (item) => item == "imageUris"
+                        );
+                        const statusIdIndex = data[0].findIndex(
+                            (item) => item == "status"
+                        );
+                        const locationIdIndex = data[0].findIndex(
+                            (item) => item == "location"
+                        );
 
                         data.forEach((element, index) => {
                             if (index > 0) {
@@ -102,6 +112,9 @@ const importData = async (state, setState) => {
                                     note: element[noteIndex],
                                     toAccountId: element[toAccountIdIndex],
                                     fromAccountId: element[fromAccountIdIndex],
+                                    imageUris: element[imageUrisIdIndex],
+                                    status: element[statusIdIndex],
+                                    location: element[locationIdIndex],
                                 };
 
                                 transactions.push(imported);
@@ -287,18 +300,29 @@ const importData = async (state, setState) => {
 
                         if (defaultState.user == constants.offline) {
                             importDataFromExcelSQLite(dataToImport);
+                            defaultState.transactions = transactions;
+                            defaultState.categories = categories;
+                            defaultState.wallets = wallets;
+                            defaultState.customFields = customFilds;
+                            defaultState.customFieldsListValues =
+                                customFieldsListValues;
+                            defaultState.customFieldsValues =
+                                customFieldsValues;
+                            setState({ ...defaultState });
                         } else {
-                            await importDataRest(dataToImport);
+                            const result = await importDataRest(dataToImport);
+                            if (result) {
+                                defaultState.transactions = transactions;
+                                defaultState.categories = categories;
+                                defaultState.wallets = wallets;
+                                defaultState.customFields = customFilds;
+                                defaultState.customFieldsListValues =
+                                    customFieldsListValues;
+                                defaultState.customFieldsValues =
+                                    customFieldsValues;
+                                setState({ ...defaultState });
+                            }
                         }
-
-                        defaultState.transactions = transactions;
-                        defaultState.categories = categories;
-                        defaultState.wallets = wallets;
-                        defaultState.customFields = customFilds;
-                        defaultState.customFieldsListValues =
-                            customFieldsListValues;
-                        defaultState.customFieldsValues = customFieldsValues;
-                        setState({ ...defaultState });
 
                         successMessage("Data imported successfuly");
                     });
